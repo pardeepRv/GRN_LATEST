@@ -114,7 +114,6 @@
 				46E6135C1162E27BDFECD5D3 /* Pods-GRNInoApp-GRNInoAppTests.debug.xcconfig */,
 				BBED6CA68A1DF094C64CB572 /* Pods-GRNInoApp-GRNInoAppTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
