@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, {Component} from 'react';
 import {
   ScrollView,
   Text,
@@ -9,123 +9,143 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   Alert,
-} from "react-native";
-import CheckBox from 'react-native-modest-checkbox'
-import { connect } from "react-redux";
-import { Images } from "../Themes";
-import GrnReceiptDetails from "././GrnReceiptDetails";
-import Utils from "../Utils/Utils";
-import DBGrnPurchaseOrderDataHelper from "../DB/DBGrnPurchaseOrderDataHelper";
-import Spinner from "react-native-loading-spinner-overlay";
-import CreateReceipt from "../Models/CreateReceipt";
-import CreateReceiptsAPIHelper from "../APIHelper/CreateReceiptsAPIHelper";
-import API from "../../App/Services/Api";
+} from 'react-native';
+import CheckBox from 'react-native-modest-checkbox';
+import {connect} from 'react-redux';
+import {Images} from '../Themes';
+import GrnReceiptDetails from '././GrnReceiptDetails';
+import Utils from '../Utils/Utils';
+import DBGrnPurchaseOrderDataHelper from '../DB/DBGrnPurchaseOrderDataHelper';
+import Spinner from 'react-native-loading-spinner-overlay';
+import CreateReceipt from '../Models/CreateReceipt';
+import CreateReceiptsAPIHelper from '../APIHelper/CreateReceiptsAPIHelper';
+import API from '../../App/Services/Api';
 
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
 // Styles
-import styles from "./Styles/GrnPurchaseOrderDetailsStyle";
-import EnvironmentVar from "../Config/EnvironmentVar";
+import styles from './Styles/GrnPurchaseOrderDetailsStyle';
+import EnvironmentVar from '../Config/EnvironmentVar';
 
 class GrnPurchaseOrderDetails extends Component {
+  api = {};
+  photoURL: '';
+  file_id: 0;
+  data: FormData;
+  totalReceiptsToPost: 0;
 
-    api = {};
-    photoURL: "";
-    file_id: 0;
-    data: FormData;
-    totalReceiptsToPost:0;
+  constructor(props) {
+    super(props);
+    this.state = {
+      entityPurchaseOrder: props.navigation.state.params.entityPurchaseOrder,
+      createReceipt: props.navigation.state.params.createReceipt,
+      dataObjects: [],
+      filteredOrderLines: [],
+      createReceiptObjects: [],
+      receiptsToPost: [],
+      isLoading: false,
+      isChecked: false,
+      currentNoOfReceiptsToPost: 0,
+      entireReceipts: [],
+      totalCount: 0,
+      envUrl: '',
+    };
 
-    constructor(props) {
-      super(props);
-      this.state = {
-        entityPurchaseOrder: props.navigation.state.params.entityPurchaseOrder,
-        createReceipt: props.navigation.state.params.createReceipt,
-        dataObjects: [],
-        filteredOrderLines:[],
-        createReceiptObjects:[],
-        receiptsToPost:[],
-        isLoading: false,
-        isChecked : false,
-        currentNoOfReceiptsToPost: 0,
-        entireReceipts:[],
-        totalCount:0,
-        envUrl:''
-      };
-
-
-      this.api = API.create();
-
-    }
+    this.api = API.create();
+    console.log(this.state.entityPurchaseOrder, 'entityPurchaseOrder>>>');
+    console.log(
+      props.navigation.state.params.dataObjects,
+      'in props dataObjects',
+    );
+  }
 
   static navigationOptions = ({navigation}) => {
     return {
-      title: "PURCHASE ORDER",
+      title: 'PURCHASE ORDER',
       headerTintColor: 'red',
       headerTitleStyle: {
-        color: 'black'
+        color: 'black',
       },
-      headerRight:
-
-      (<TouchableOpacity onPress={navigation.getParam('submitReceiptAlert')}>
-        <Text style={styles.menuButton}>SUBMIT</Text>
-      </TouchableOpacity>)
-
-    }
+      headerRight: (
+        <TouchableOpacity onPress={navigation.getParam('submitReceiptAlert')}>
+          <Text style={styles.menuButton}>SUBMIT</Text>
+        </TouchableOpacity>
+      ),
+    };
   };
 
   componentDidMount() {
-
     EnvironmentVar()
-    .then((res) => {
-      console.log("getting ENV in orderDetails", res);
-      this.setState({
-        envUrl: res,
-      });
-     
-        API.create(res);
-    })
-    .catch((err) => {
-      console.log("IN error", err);
-    });
+      .then(res => {
+        console.log('getting ENV in orderDetails', res);
+        this.setState({
+          envUrl: res,
+        });
 
-    this.props.navigation.setParams({submitReceiptAlert: this._submitReceiptAlert})
-    console.log("Component Did mount");
+        API.create(res);
+      })
+      .catch(err => {
+        console.log('IN error', err);
+      });
+
+    this.props.navigation.setParams({
+      submitReceiptAlert: this._submitReceiptAlert,
+    });
+    console.log('Component Did mount');
     this.getDBGrnPO();
     this.getCreateReceipts();
   }
 
-  checkPoStatus(){
-    var count = 0
+  checkPoStatus() {
+    var count = 0;
     for (let i = 0; i < this.state.filteredOrderLines.length; i++) {
       let entity = this.state.filteredOrderLines[i];
-      if (entity.submitStatus != "processing" && entity.submitStatus != "pending" ){
-        count += 1
+      if (
+        entity.submitStatus != 'processing' &&
+        entity.submitStatus != 'pending'
+      ) {
+        count += 1;
       }
     }
 
-    console.log("Print Count:", count)
+    console.log('Print Count:', count);
     this.setState({
-      totalCount:count
+      totalCount: count,
     });
   }
 
   async getDBGrnPO() {
     // Retrieve from DB
-    let dbPurchaseOrders = await DBGrnPurchaseOrderDataHelper.getPOByOrderNumber(
-      this.state.entityPurchaseOrder.order_number
-    );
-    console.log("DB rrrr: ", dbPurchaseOrders);
 
-    dbPurchaseOrders.map((orderLine) => {
-      if (orderLine.quantity_available_to_receive > 0 ){
-        this.state.filteredOrderLines.push(orderLine)
+    this.props.navigation.state.params.dataObjects.map(orderLine => {
+      if (orderLine.quantity_available_to_receive > 0) {
+        this.state.filteredOrderLines.push(orderLine);
       }
-    })
-    console.log("filteredOrderLines: ", this.state.filteredOrderLines);
+    });
 
-   this.setState({
-      dataObjects: this.state.filteredOrderLines
+    this.setState({
+      dataObjects: this.state.filteredOrderLines,
+    });
+
+    this.checkPoStatus();
+
+    return;
+    let dbPurchaseOrders =
+      await DBGrnPurchaseOrderDataHelper.getPOByOrderNumber(
+        this.state.entityPurchaseOrder.order_number,
+      );
+    console.log('DB rrrr: ', dbPurchaseOrders);
+
+    dbPurchaseOrders.map(orderLine => {
+      if (orderLine.quantity_available_to_receive > 0) {
+        this.state.filteredOrderLines.push(orderLine);
+      }
+    });
+    console.log('filteredOrderLines: ', this.state.filteredOrderLines);
+
+    this.setState({
+      dataObjects: this.state.filteredOrderLines,
     });
 
     this.checkPoStatus();
@@ -133,290 +153,297 @@ class GrnPurchaseOrderDetails extends Component {
 
   async getCreateReceipts() {
     // Retrieve from DB
-    let dbCreateReceipts = await DBGrnPurchaseOrderDataHelper.getCreateReceipts(
-      this.state.entityPurchaseOrder.order_number
+
+    // let dbCreateReceipts = await DBGrnPurchaseOrderDataHelper.getCreateReceipts(
+    //   this.state.entityPurchaseOrder.order_number,
+    // );
+
+    let dbCreateReceipts =
+      this.props.navigation.state.params.dataObjects.filter((val, i) => {
+        return val.order_number == this.state.entityPurchaseOrder.order_number;
+      });
+    console.log(
+      'createReceipts retrieved from DB: need to check ',
+      dbCreateReceipts,
+      this.state.entityPurchaseOrder.order_number,
     );
-    console.log("createReceipts retrieved from DB: ", dbCreateReceipts,this.state.entityPurchaseOrder.order_number);
 
     this.setState({
-      createReceiptObjects: dbCreateReceipts
+      createReceiptObjects: dbCreateReceipts,
     });
   }
 
-  returnData(edited,comments, photoURL, quantity, index){
-
-    let updatedData = [...this.state.dataObjects]
-    updatedData[index] = {...updatedData[index],
+  returnData(edited, comments, photoURL, quantity, index) {
+    let updatedData = [...this.state.dataObjects];
+    updatedData[index] = {
+      ...updatedData[index],
       edited: edited,
-      comments:comments,
+      comments: comments,
       photoURL: photoURL,
-      quantity_received: quantity
-    }
-    this.setState({dataObjects:updatedData})
-
+      quantity_received: quantity,
+    };
+    this.setState({dataObjects: updatedData});
   }
 
-  refreshStatus(submitStatus, index){
-
-    let updatedData = [...this.state.dataObjects]
-    updatedData[index] = {...updatedData[index],
-      submitStatus:submitStatus
-    }
-    this.setState({dataObjects:updatedData})
-
+  refreshStatus(submitStatus, index) {
+    let updatedData = [...this.state.dataObjects];
+    updatedData[index] = {...updatedData[index], submitStatus: submitStatus};
+    this.setState({dataObjects: updatedData});
   }
 
   submitAllCreateReceiptsAlert = async () => {
-
     Alert.alert(
-      "Submit Receipts?",
-      "Are you sure you want to submit the receipts for all the open purchase order lines? This will ignore any selected lines or draft receipts created previously.",
+      'Submit Receipts?',
+      'Are you sure you want to submit the receipts for all the open purchase order lines? This will ignore any selected lines or draft receipts created previously.',
       [
-        { text: "Cancel", style: '' },
-        { text: "OK", onPress: this.submitAllCreateReceipts.bind(this) }
+        {text: 'Cancel', style: ''},
+        {text: 'OK', onPress: this.submitAllCreateReceipts.bind(this)},
       ],
-      { cancelable: false }
+      {cancelable: false},
     );
   };
 
-  submitAllCreateReceipts = async() => {
-
-    await this.getCreateReceipts();
+  submitAllCreateReceipts = async () => {
+    // await this.getCreateReceipts();
     await this.saveCreateAllReceipt();
     await this.submitReceipt();
-  }
+  };
 
   submitSuccessfulAlert() {
     Alert.alert(
-      "Successful",
-      "Receipts successfully submitted.",
-      [
-        { text: "OK", onPress: this.navigateBackToMyReceipts }
-      ],
-      { cancelable: false }
+      'Successful',
+      'Receipts successfully submitted.',
+      [{text: 'OK', onPress: this.navigateBackToMyReceipts}],
+      {cancelable: false},
     );
   }
 
   navigateBackToMyReceipts = async () => {
-  this.props.navigation.pop()
-  }
+    this.props.navigation.pop();
+  };
 
   submitFailedAlert() {
     Alert.alert(
-      "",
-      "Unable to submit the receipts as there is no internet connection. The receipt will be submitted when there is connection.",
-      [
-        { text: "OK", onPress: this.refreshData }
-      ],
-      { cancelable: false }
+      '',
+      'Unable to submit the receipts as there is no internet connection. The receipt will be submitted when there is connection.',
+      [{text: 'OK', onPress: this.refreshData}],
+      {cancelable: false},
     );
-  };
-
-  refreshData = async () => {
-    this.getDBGrnPO()
   }
 
+  refreshData = async () => {
+    this.getDBGrnPO();
+  };
+
   _submitReceiptAlert = () => {
-    if (this.state.createReceiptObjects.length>0){
+    
+    if (this.state.createReceiptObjects.length > 0) {
       Alert.alert(
-        "Submit Receipts?",
-        "Are you sure you want to submit the receipts for all the selected purchase order lines?",
+        'Submit Receipts?',
+        'Are you sure you want to submit the receipts for all the selected purchase order lines?',
         [
-          { text: "Cancel", style: '' },
-          { text: "OK", onPress: this.submitReceipt.bind(this) }
+          {text: 'Cancel', style: ''},
+          {text: 'OK', onPress: this.submitReceipt.bind(this)},
         ],
-        { cancelable: false }
+        {cancelable: false},
       );
-    }else {
+    } else {
       Alert.alert(
-        "",
-        "Please create at least one receipt to submit.",
-        [
-          { text: "OK"}
-        ],
-        { cancelable: false }
+        '',
+        'Please create at least one receipt to submit.',
+        [{text: 'OK'}],
+        {cancelable: false},
       );
     }
   };
 
   submitReceipt = () => {
-
     this.setState({isLoading: true});
 
     this.getCreateReceipts();
-    console.log("Print Create Receipts: ", this.state.createReceiptObjects)
+    console.log('Print Create Receipts: ', this.state.createReceiptObjects);
 
     if (this.state.createReceiptObjects != null) {
-
       for (let i = 0; i < this.state.createReceiptObjects.length; i++) {
+        let entity = this.state.createReceiptObjects[i];
 
-      let entity = this.state.createReceiptObjects[i];
+        if (entity.photoURL != null && entity.photoURL != '') {
+          console.log('PRINT PHOTOURL: ', entity.photoURL);
+          let source = {
+            uri: entity.photoURL,
+          };
+          this.photoURL = entity.photoURL;
+          this.data = new FormData();
+          this.data.append('photo', {
+            uri: entity.photoURL,
+            type: 'image/jpeg', // or photo.type
+            name: 'testPhotoName',
+          });
 
-        if (entity.photoURL != null && entity.photoURL != ""){
-          console.log("PRINT PHOTOURL: ", entity.photoURL)
-            let source = {
-              uri: entity.photoURL
-            };
-            this.photoURL = entity.photoURL
-            this.data = new FormData();
-            this.data.append('photo', {
-              uri: entity.photoURL,
-              type: 'image/jpeg', // or photo.type
-              name: 'testPhotoName'
-            });
-
-            // API.create(this.state.envUrl);
-            //send file API : upload image
-            this.uploadImage(entity.id)
-
-          }else {
-            this.state.currentNoOfReceiptsToPost++;
-            this.counterToCallCreateReceiptsAPI(this.state.currentNoOfReceiptsToPost, this.state.createReceiptObjects.length)
+          // API.create(this.state.envUrl);
+          //send file API : upload image
+          this.uploadImage(entity.id);
+        } else {
+          this.state.currentNoOfReceiptsToPost++;
+          this.counterToCallCreateReceiptsAPI(
+            this.state.currentNoOfReceiptsToPost,
+            this.state.createReceiptObjects.length,
+          );
         }
       }
-    }else {
-        console.log("No Create Receipt in DB");
-  }
-}
+    } else {
+      console.log('No Create Receipt in DB');
+    }
+  };
 
   async updateCreateReceiptFile(id, file_id) {
-
-    let dbCreateReceipt = await DBGrnPurchaseOrderDataHelper.updateCreateReceiptFile(id, file_id);
+    let dbCreateReceipt =
+      await DBGrnPurchaseOrderDataHelper.updateCreateReceiptFile(id, file_id);
     return dbCreateReceipt;
   }
 
   async postCreateReceipt() {
-    console.log("Did Enter Post Create Receipt ")
+    console.log('Did Enter Post Create Receipt ');
     this.setState({isLoading: true});
 
-    for (let i = 0; i < this.state.createReceiptObjects.length; i++) {
+    // for (let i = 0; i < this.state.createReceiptObjects.length; i++) {
+    //   let entity = this.state.createReceiptObjects[i];
 
-    let entity = this.state.createReceiptObjects[i];
+    //   console.log(entity.order_line_number, entity.distribution_number);
+    //   await DBGrnPurchaseOrderDataHelper.updateCreateReceiptStatus(
+    //     entity.order_number,
+    //     entity.distribution_number,
+    //     entity.order_line_number,
+    //     true,
+    //     'pending',
+    //     new Date(),
+    //     entity.quantity,
+    //   );
+    // }
 
-    console.log(entity.order_line_number, entity.distribution_number)
-    await DBGrnPurchaseOrderDataHelper.updateCreateReceiptStatus(
-      entity.order_number,
-      entity.distribution_number,
-      entity.order_line_number,
-      true,
-      "pending",
-      new Date(),
-      entity.quantity);
+    console.log(' updated Receipts To Post ', this.state.createReceiptObjects);
 
-    }
-
-
-    console.log(" updated Receipts To Post ",this.state.createReceiptObjects);
-
-    const username = await Utils.retrieveDataFromAsyncStorage("USER_NAME");
-    const response = await CreateReceiptsAPIHelper.postCreateReceipt(username,this.state.createReceiptObjects);
+    const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
+    const response = await CreateReceiptsAPIHelper.postCreateReceipt(
+      username,
+      this.state.createReceiptObjects,
+      this.state.envUrl
+    );
 
     this.setState({isLoading: false});
 
     setTimeout(() => {
       if (response.ok) {
-        console.log("Print Receipts",this.state.createReceiptObjects);
-        console.log("Response API ok: ", response.data);
+        console.log('Print Receipts', this.state.createReceiptObjects);
+        console.log('Response API ok: ', response.data);
         this.submitSuccessfulAlert();
-
       } else {
-        console.log("Response API: failed", response.status + " - " + response.problem);
+        console.log(
+          'Response API: failed',
+          response.status + ' - ' + response.problem,
+        );
         this.submitFailedAlert();
       }
     }, 100);
+  }
 
-  };
-
-  async counterToCallCreateReceiptsAPI(currentNoOfReceiptsToPost, totalReceiptsToPost) {
-
-    if (currentNoOfReceiptsToPost == totalReceiptsToPost){
+  async counterToCallCreateReceiptsAPI(
+    currentNoOfReceiptsToPost,
+    totalReceiptsToPost,
+  ) {
+    if (currentNoOfReceiptsToPost == totalReceiptsToPost) {
       this.postCreateReceipt();
     }
-  };
+  }
 
   async uploadImage(entityID) {
-
     this.setState({isLoading: true});
-    console.log("Image data", this.data);
-    const username = await Utils.retrieveDataFromAsyncStorage("USER_NAME");
+    console.log('Image data', this.data);
+    const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
     const params = [username, 'testPhotoName', this.data];
-    let result = await this.api["postPhoto"].apply(this, params)
+    let result = await this.api['postPhoto'].apply(this, params);
 
     this.setState({isLoading: false});
     setTimeout(async () => {
-
       if (result.ok) {
-        console.log("Response API ok: ", result.data);
+        console.log('Response API ok: ', result.data);
         this.file_id = result.data.REQUEST_ID;
-        console.log("API Response:", entityID, this.data, this.photoURL)
+        console.log('API Response:', entityID, this.data, this.photoURL);
 
         //update file id to local
-       await this.updateCreateReceiptFile(entityID, this.file_id);
+        // await this.updateCreateReceiptFile(entityID, this.file_id);
 
-       this.state.currentNoOfReceiptsToPost++;
-       this.counterToCallCreateReceiptsAPI(this.state.currentNoOfReceiptsToPost, this.state.createReceiptObjects.length)
-
+        this.state.currentNoOfReceiptsToPost++;
+        this.counterToCallCreateReceiptsAPI(
+          this.state.currentNoOfReceiptsToPost,
+          this.state.createReceiptObjects.length,
+        );
       } else {
-        console.log("Response API: failed", result.status + " - " + result.problem);
-
+        console.log(
+          'Response API: failed',
+          result.status + ' - ' + result.problem,
+        );
       }
-    }, 100)
+    }, 100);
   }
 
   async saveCreateAllReceipt() {
-
     let purchaseOrder = this.state.entityPurchaseOrder;
 
     // Loop through all the lines and create CreateReceipts
-    await this.state.dataObjects.map(async (item) => {
-      if (item.submitStatus !="processing" && item.submitStatus != "pending"){
-        this.state.entireReceipts.push(item)
+    await this.state.dataObjects.map(async item => {
+      if (item.submitStatus != 'processing' && item.submitStatus != 'pending') {
+        this.state.entireReceipts.push(item);
       }
-    })
+    });
 
-    if (this.state.entireReceipts.length > 0){
+    if (this.state.entireReceipts.length > 0) {
+      await this.state.entireReceipts.map(async item => {
+        console.log('Submite Status: ', item.submitStatus);
+        // Convert quantity string to number
+        var quantityNum = parseFloat(item.quantity_available_to_receive);
 
-        await this.state.entireReceipts.map(async (item) => {
-            console.log("Submite Status: ", item.submitStatus)
-          // Convert quantity string to number
-          var quantityNum = parseFloat(item.quantity_available_to_receive);
+        return;
+        var test = await DBGrnPurchaseOrderDataHelper.saveCreateReceipt(
+          '',
+          item.item_description,
+          true,
+          0.0,
+          '',
+          item.quantity_available_to_receive,
+          item.order_line_number,
+          item.order_number,
+          item.quantity_ordered,
+          '',
+          item.quantity_available_to_receive,
+          'draft',
+          new Date(),
+          item.to_organization,
+          item.to_organization_id,
+          'createReceipt',
+          item.unit_of_measure,
+          item.distribution_number,
+        );
 
-          var test = await DBGrnPurchaseOrderDataHelper.saveCreateReceipt(
-            "",
-            item.item_description,
-            true,
-            0.0,
-            "",
-            item.quantity_available_to_receive,
-            item.order_line_number,
-            item.order_number,
-            item.quantity_ordered,
-            "",
-            item.quantity_available_to_receive,
-            "draft",
-            new Date(),
-            item.to_organization,
-            item.to_organization_id,
-            "createReceipt",
-            item.unit_of_measure,
-            item.distribution_number,
-
-          );
-
-          DBGrnPurchaseOrderDataHelper.updatePOStatus(item.order_number,
-            item.distribution_number, item.order_line_number,true, "pending",
-            new Date(), item.quantity_available_to_receive,
-            item.quantity_available_to_receive, "","");
-
-      })
+        DBGrnPurchaseOrderDataHelper.updatePOStatus(
+          item.order_number,
+          item.distribution_number,
+          item.order_line_number,
+          true,
+          'pending',
+          new Date(),
+          item.quantity_available_to_receive,
+          item.quantity_available_to_receive,
+          '',
+          '',
+        );
+      });
     } else {
       Alert.alert(
-        "",
-        "No purchase order lines available for receiving.",
-        [
-          { text: "OK" }
-        ],
-        { cancelable: false }
+        '',
+        'No purchase order lines available for receiving.',
+        [{text: 'OK'}],
+        {cancelable: false},
       );
     }
   }
@@ -435,287 +462,295 @@ class GrnPurchaseOrderDetails extends Component {
     * e.g.
       return <MyCustomCell title={item.title} description={item.description} />
     *************************************************************/
-  renderRow = ({ item, index }) => {
-    if (!item.edited){
-
-    if (item.submitStatus == "processing"){
-      return (
-        <TouchableHighlight
-          onPress={() => {
-            this.props.navigation.navigate("GrnReceiptDetails", {
-              entityPurchaseOrder: item,
-              index: index,
-              returnData:this.returnData.bind(this),
-              refreshStatus: this.refreshStatus.bind(this),
-              envUrl:this.state.envUrl
-            });
-          }}>
-          <View>
-            <View style={styles.row}>
-              <View style={styles.rowSection1Processing}>
-              <CheckBox
-                checkboxStyle={styles.checkboxDisabled}
-                checked ={item.edited}
-                label={""}
-                />
+  renderRow = ({item, index}) => {
+    if (!item.edited) {
+      if (item.submitStatus == 'processing') {
+        return (
+          <TouchableHighlight
+            onPress={() => {
+              this.props.navigation.navigate('GrnReceiptDetails', {
+                entityPurchaseOrder: item,
+                index: index,
+                returnData: this.returnData.bind(this),
+                refreshStatus: this.refreshStatus.bind(this),
+                envUrl: this.state.envUrl,
+              });
+            }}>
+            <View>
+              <View style={styles.row}>
+                <View style={styles.rowSection1Processing}>
+                  <CheckBox
+                    checkboxStyle={styles.checkboxDisabled}
+                    checked={item.edited}
+                    label={''}
+                  />
+                </View>
+                <View style={styles.rowSection2}>
+                  <Text style={styles.rowLabel}>{item.item_number}</Text>
+                </View>
+                <View style={styles.rowSection3}>
+                  <Text style={styles.rowLabel}>{item.item_description}</Text>
+                </View>
+                <View style={styles.rowSection4}>
+                  <Text style={styles.rowLabel}>
+                    {item.distribution_number}
+                  </Text>
+                </View>
+                <View style={styles.rowSection5}>
+                  <Text style={styles.rowLabel}>{item.delivery_date}</Text>
+                </View>
+                <View style={styles.rowSection6}>
+                  <Image
+                    source={Images.rightArrow}
+                    style={styles.rightArrow}
+                    resizeMode="center"
+                  />
+                </View>
               </View>
-              <View style={styles.rowSection2}>
-                <Text style={styles.rowLabel}>{item.item_number}</Text>
-              </View>
-              <View style={styles.rowSection3}>
-                <Text style={styles.rowLabel}>{item.item_description}</Text>
-              </View>
-              <View style={styles.rowSection4}>
-                <Text style={styles.rowLabel}>{item.distribution_number}</Text>
-              </View>
-              <View style={styles.rowSection5}>
-                <Text style={styles.rowLabel}>{item.delivery_date}</Text>
-              </View>
-              <View style={styles.rowSection6}>
-                <Image
-                  source={Images.rightArrow}
-                  style={styles.rightArrow}
-                  resizeMode="center"
-                />
-              </View>
+              <View style={styles.speratorline} />
             </View>
-            <View style={styles.speratorline} />
-          </View>
-        </TouchableHighlight>);
-    }else if (item.submitStatus == "pending"){
-      return (
-        <TouchableHighlight
-          onPress={() => {
-            this.props.navigation.navigate("GrnReceiptDetails", {
-              entityPurchaseOrder: item,
-              index: index,
-              returnData:this.returnData.bind(this),
-              refreshStatus: this.refreshStatus.bind(this),
-              envUrl:this.state.envUrl
-
-            });
-          }}>
-          <View>
-            <View style={styles.row}>
-              <View style={styles.rowSection1Pending}>
-              <CheckBox
-                checkboxStyle={styles.checkboxDisabled}
-                checked ={item.edited}
-                label={""}
-                />
+          </TouchableHighlight>
+        );
+      } else if (item.submitStatus == 'pending') {
+        return (
+          <TouchableHighlight
+            onPress={() => {
+              this.props.navigation.navigate('GrnReceiptDetails', {
+                entityPurchaseOrder: item,
+                index: index,
+                returnData: this.returnData.bind(this),
+                refreshStatus: this.refreshStatus.bind(this),
+                envUrl: this.state.envUrl,
+              });
+            }}>
+            <View>
+              <View style={styles.row}>
+                <View style={styles.rowSection1Pending}>
+                  <CheckBox
+                    checkboxStyle={styles.checkboxDisabled}
+                    checked={item.edited}
+                    label={''}
+                  />
+                </View>
+                <View style={styles.rowSection2}>
+                  <Text style={styles.rowLabel}>{item.item_number}</Text>
+                </View>
+                <View style={styles.rowSection3}>
+                  <Text style={styles.rowLabel}>{item.item_description}</Text>
+                </View>
+                <View style={styles.rowSection4}>
+                  <Text style={styles.rowLabel}>
+                    {item.distribution_number}
+                  </Text>
+                </View>
+                <View style={styles.rowSection5}>
+                  <Text style={styles.rowLabel}>{item.delivery_date}</Text>
+                </View>
+                <View style={styles.rowSection6}>
+                  <Image
+                    source={Images.rightArrow}
+                    style={styles.rightArrow}
+                    resizeMode="center"
+                  />
+                </View>
               </View>
-              <View style={styles.rowSection2}>
-                <Text style={styles.rowLabel}>{item.item_number}</Text>
+              <View style={styles.speratorline} />
+            </View>
+          </TouchableHighlight>
+        );
+      } else {
+        return (
+          <TouchableHighlight
+            onPress={() => {
+              this.props.navigation.navigate('GrnReceiptDetails', {
+                entityPurchaseOrder: item,
+                index: index,
+                returnData: this.returnData.bind(this),
+                refreshStatus: this.refreshStatus.bind(this),
+                envUrl: this.state.envUrl,
+              });
+            }}>
+            <View>
+              <View style={styles.row}>
+                <View style={styles.rowSection1}>
+                  <CheckBox
+                    checkboxStyle={styles.checkboxDisabled}
+                    checked={item.edited}
+                    label={''}
+                  />
+                </View>
+                <View style={styles.rowSection2}>
+                  <Text style={styles.rowLabel}>{item.item_number}</Text>
+                </View>
+                <View style={styles.rowSection3}>
+                  <Text style={styles.rowLabel}>{item.item_description}</Text>
+                </View>
+                <View style={styles.rowSection4}>
+                  <Text style={styles.rowLabel}>
+                    {item.distribution_number}
+                  </Text>
+                </View>
+                <View style={styles.rowSection5}>
+                  <Text style={styles.rowLabel}>{item.delivery_date}</Text>
+                </View>
+                <View style={styles.rowSection6}>
+                  <Image
+                    source={Images.rightArrow}
+                    style={styles.rightArrow}
+                    resizeMode="center"
+                  />
+                </View>
               </View>
-              <View style={styles.rowSection3}>
-                <Text style={styles.rowLabel}>{item.item_description}</Text>
-              </View>
-              <View style={styles.rowSection4}>
-                <Text style={styles.rowLabel}>{item.distribution_number}</Text>
-              </View>
-              <View style={styles.rowSection5}>
-                <Text style={styles.rowLabel}>{item.delivery_date}</Text>
-              </View>
-              <View style={styles.rowSection6}>
-                <Image
-                  source={Images.rightArrow}
-                  style={styles.rightArrow}
-                  resizeMode="center"
-                />
-              </View>
+              <View style={styles.speratorline} />
             </View>
-            <View style={styles.speratorline} />
-          </View>
-        </TouchableHighlight>);
-    }else{
-
-    return (
-      <TouchableHighlight
-        onPress={() => {
-          this.props.navigation.navigate("GrnReceiptDetails", {
-            entityPurchaseOrder: item,
-            index: index,
-            returnData:this.returnData.bind(this),
-            refreshStatus: this.refreshStatus.bind(this),
-            envUrl:this.state.envUrl
-
-          });
-        }}>
-        <View>
-          <View style={styles.row}>
-            <View style={styles.rowSection1}>
-            <CheckBox
-              checkboxStyle={styles.checkboxDisabled}
-              checked ={item.edited}
-              label={""}
-              />
-            </View>
-            <View style={styles.rowSection2}>
-              <Text style={styles.rowLabel}>{item.item_number}</Text>
-            </View>
-            <View style={styles.rowSection3}>
-              <Text style={styles.rowLabel}>{item.item_description}</Text>
-            </View>
-            <View style={styles.rowSection4}>
-              <Text style={styles.rowLabel}>{item.distribution_number}</Text>
-            </View>
-            <View style={styles.rowSection5}>
-              <Text style={styles.rowLabel}>{item.delivery_date}</Text>
-            </View>
-            <View style={styles.rowSection6}>
-              <Image
-                source={Images.rightArrow}
-                style={styles.rightArrow}
-                resizeMode="center"
-              />
-            </View>
-          </View>
-          <View style={styles.speratorline} />
-        </View>
-      </TouchableHighlight>);
-    }
-  }else {
-    if (item.submitStatus == "processing") {
-    return (
-      <TouchableHighlight
-        onPress={() => {
-          this.props.navigation.navigate("GrnReceiptDetails", {
-            entityPurchaseOrder: item,
-            index: index,
-            returnData:this.returnData.bind(this),
-            refreshStatus: this.refreshStatus.bind(this),
-            envUrl:this.state.envUrl
-
-          });
-        }}
-      >
-        <View>
-          <View style={styles.rowProcessing}>
-            <View style={styles.rowSection1Processing}>
-            <CheckBox
-              checkboxStyle={styles.checkbox}
-              checked ={item.edited}
-              label={""}
-              />
-            </View>
-            <View style={styles.rowSection2}>
-              <Text style={styles.rowLabel}>{item.item_number}</Text>
-            </View>
-            <View style={styles.rowSection3}>
-              <Text style={styles.rowLabel}>{item.item_description}</Text>
-            </View>
-            <View style={styles.rowSection4}>
-              <Text style={styles.rowLabel}>{item.distribution_number}</Text>
-            </View>
-            <View style={styles.rowSection5}>
-              <Text style={styles.rowLabel}>{item.delivery_date}</Text>
-            </View>
-            <View style={styles.rowSection6}>
-              <Image
-                source={Images.rightArrow}
-                style={styles.rightArrow}
-                resizeMode="center"
-              />
-            </View>
-          </View>
-          <View style={styles.speratorline} />
-        </View>
-      </TouchableHighlight>);
-    } else if (item.submitStatus == "pending"){
-      return (
-        <TouchableHighlight
-          onPress={() => {
-            this.props.navigation.navigate("GrnReceiptDetails", {
-              entityPurchaseOrder: item,
-              index: index,
-              returnData:this.returnData.bind(this),
-              refreshStatus: this.refreshStatus.bind(this),
-              envUrl:this.state.envUrl
-
-            });
-          }}
-        >
-          <View>
-            <View style={styles.row}>
-              <View style={styles.rowSection1Pending}>
-              <CheckBox
-                checkboxStyle={styles.checkbox}
-                checked ={item.edited}
-                label={""}
-                />
-              </View>
-              <View style={styles.rowSection2}>
-                <Text style={styles.rowLabel}>{item.item_number}</Text>
-              </View>
-              <View style={styles.rowSection3}>
-                <Text style={styles.rowLabel}>{item.item_description}</Text>
-              </View>
-              <View style={styles.rowSection4}>
-                <Text style={styles.rowLabel}>{item.distribution_number}</Text>
-              </View>
-              <View style={styles.rowSection5}>
-                <Text style={styles.rowLabel}>{item.delivery_date}</Text>
-              </View>
-              <View style={styles.rowSection6}>
-                <Image
-                  source={Images.rightArrow}
-                  style={styles.rightArrow}
-                  resizeMode="center"
-                />
-              </View>
-            </View>
-            <View style={styles.speratorline} />
-          </View>
-        </TouchableHighlight>);
+          </TouchableHighlight>
+        );
+      }
     } else {
-      return (
-        <TouchableHighlight
-          onPress={() => {
-            this.props.navigation.navigate("GrnReceiptDetails", {
-              entityPurchaseOrder: item,
-              index: index,
-              returnData:this.returnData.bind(this),
-              refreshStatus: this.refreshStatus.bind(this),
-              envUrl:this.state.envUrl
-
-            });
-          }}
-        >
-          <View>
-            <View style={styles.row}>
-              <View style={styles.rowSection1}>
-              <CheckBox
-                checkboxStyle={styles.checkbox}
-                checked ={item.edited}
-                label={""}
-                />
+      if (item.submitStatus == 'processing') {
+        return (
+          <TouchableHighlight
+            onPress={() => {
+              this.props.navigation.navigate('GrnReceiptDetails', {
+                entityPurchaseOrder: item,
+                index: index,
+                returnData: this.returnData.bind(this),
+                refreshStatus: this.refreshStatus.bind(this),
+                envUrl: this.state.envUrl,
+              });
+            }}>
+            <View>
+              <View style={styles.rowProcessing}>
+                <View style={styles.rowSection1Processing}>
+                  <CheckBox
+                    checkboxStyle={styles.checkbox}
+                    checked={item.edited}
+                    label={''}
+                  />
+                </View>
+                <View style={styles.rowSection2}>
+                  <Text style={styles.rowLabel}>{item.item_number}</Text>
+                </View>
+                <View style={styles.rowSection3}>
+                  <Text style={styles.rowLabel}>{item.item_description}</Text>
+                </View>
+                <View style={styles.rowSection4}>
+                  <Text style={styles.rowLabel}>
+                    {item.distribution_number}
+                  </Text>
+                </View>
+                <View style={styles.rowSection5}>
+                  <Text style={styles.rowLabel}>{item.delivery_date}</Text>
+                </View>
+                <View style={styles.rowSection6}>
+                  <Image
+                    source={Images.rightArrow}
+                    style={styles.rightArrow}
+                    resizeMode="center"
+                  />
+                </View>
               </View>
-              <View style={styles.rowSection2}>
-                <Text style={styles.rowLabel}>{item.item_number}</Text>
-              </View>
-              <View style={styles.rowSection3}>
-                <Text style={styles.rowLabel}>{item.item_description}</Text>
-              </View>
-              <View style={styles.rowSection4}>
-                <Text style={styles.rowLabel}>{item.distribution_number}</Text>
-              </View>
-              <View style={styles.rowSection5}>
-                <Text style={styles.rowLabel}>{item.delivery_date}</Text>
-              </View>
-              <View style={styles.rowSection6}>
-                <Image
-                  source={Images.rightArrow}
-                  style={styles.rightArrow}
-                  resizeMode="center"
-                />
-              </View>
+              <View style={styles.speratorline} />
             </View>
-            <View style={styles.speratorline} />
-          </View>
-        </TouchableHighlight>);
+          </TouchableHighlight>
+        );
+      } else if (item.submitStatus == 'pending') {
+        return (
+          <TouchableHighlight
+            onPress={() => {
+              this.props.navigation.navigate('GrnReceiptDetails', {
+                entityPurchaseOrder: item,
+                index: index,
+                returnData: this.returnData.bind(this),
+                refreshStatus: this.refreshStatus.bind(this),
+                envUrl: this.state.envUrl,
+              });
+            }}>
+            <View>
+              <View style={styles.row}>
+                <View style={styles.rowSection1Pending}>
+                  <CheckBox
+                    checkboxStyle={styles.checkbox}
+                    checked={item.edited}
+                    label={''}
+                  />
+                </View>
+                <View style={styles.rowSection2}>
+                  <Text style={styles.rowLabel}>{item.item_number}</Text>
+                </View>
+                <View style={styles.rowSection3}>
+                  <Text style={styles.rowLabel}>{item.item_description}</Text>
+                </View>
+                <View style={styles.rowSection4}>
+                  <Text style={styles.rowLabel}>
+                    {item.distribution_number}
+                  </Text>
+                </View>
+                <View style={styles.rowSection5}>
+                  <Text style={styles.rowLabel}>{item.delivery_date}</Text>
+                </View>
+                <View style={styles.rowSection6}>
+                  <Image
+                    source={Images.rightArrow}
+                    style={styles.rightArrow}
+                    resizeMode="center"
+                  />
+                </View>
+              </View>
+              <View style={styles.speratorline} />
+            </View>
+          </TouchableHighlight>
+        );
+      } else {
+        return (
+          <TouchableHighlight
+            onPress={() => {
+              this.props.navigation.navigate('GrnReceiptDetails', {
+                entityPurchaseOrder: item,
+                index: index,
+                returnData: this.returnData.bind(this),
+                refreshStatus: this.refreshStatus.bind(this),
+                envUrl: this.state.envUrl,
+              });
+            }}>
+            <View>
+              <View style={styles.row}>
+                <View style={styles.rowSection1}>
+                  <CheckBox
+                    checkboxStyle={styles.checkbox}
+                    checked={item.edited}
+                    label={''}
+                  />
+                </View>
+                <View style={styles.rowSection2}>
+                  <Text style={styles.rowLabel}>{item.item_number}</Text>
+                </View>
+                <View style={styles.rowSection3}>
+                  <Text style={styles.rowLabel}>{item.item_description}</Text>
+                </View>
+                <View style={styles.rowSection4}>
+                  <Text style={styles.rowLabel}>
+                    {item.distribution_number}
+                  </Text>
+                </View>
+                <View style={styles.rowSection5}>
+                  <Text style={styles.rowLabel}>{item.delivery_date}</Text>
+                </View>
+                <View style={styles.rowSection6}>
+                  <Image
+                    source={Images.rightArrow}
+                    style={styles.rightArrow}
+                    resizeMode="center"
+                  />
+                </View>
+              </View>
+              <View style={styles.speratorline} />
+            </View>
+          </TouchableHighlight>
+        );
+      }
     }
-    };
-  }
+  };
 
   /************************************************************
    * STEP 3
@@ -749,7 +784,7 @@ class GrnPurchaseOrderDetails extends Component {
     if (this.state.totalCount > 0) {
       return (
         <View style={styles.container}>
-        <Spinner visible={this.state.isLoading} />
+          <Spinner visible={this.state.isLoading} />
 
           <ScrollView style={styles.mainContainer}>
             <View style={styles.mainContainer}>
@@ -782,8 +817,7 @@ class GrnPurchaseOrderDetails extends Component {
               <View style={styles.buttonView}>
                 <TouchableOpacity
                   onPress={this.submitAllCreateReceiptsAlert.bind(this)}
-                  style={styles.submitAllCreateReceiptsButton}
-                >
+                  style={styles.submitAllCreateReceiptsButton}>
                   <View>
                     <Text style={styles.submitAllCreateReceiptsButtonText}>
                       RECEIVE ENTIRE PO
@@ -831,10 +865,10 @@ class GrnPurchaseOrderDetails extends Component {
           </ScrollView>
         </View>
       );
-    }else {
+    } else {
       return (
         <View style={styles.container}>
-        <Spinner visible={this.state.isLoading} />
+          <Spinner visible={this.state.isLoading} />
 
           <ScrollView style={styles.mainContainer}>
             <View style={styles.mainContainer}>
@@ -866,9 +900,7 @@ class GrnPurchaseOrderDetails extends Component {
               <View style={styles.line} />
               <View style={styles.buttonView}>
                 <TouchableOpacity
-
-                  style={styles.submitAllCreateReceiptsButtonInactive}
-                >
+                  style={styles.submitAllCreateReceiptsButtonInactive}>
                   <View>
                     <Text style={styles.submitAllCreateReceiptsButtonText}>
                       RECEIVE ENTIRE PO
@@ -917,7 +949,6 @@ class GrnPurchaseOrderDetails extends Component {
         </View>
       );
     }
-
   }
 }
 
@@ -931,5 +962,5 @@ const mapDispatchToProps = dispatch => {
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(GrnPurchaseOrderDetails);

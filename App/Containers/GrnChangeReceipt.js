@@ -63,7 +63,7 @@ class GrnChangeReceipt extends Component {
   // MARK: Api
   async getEnvVar() {
     const environment = await Utils.retrieveDataFromAsyncStorage('ENVIRONMENT');
-    console.tron.log('Environment Variable (API) ', environment);
+    console.log('Environment Variable (API) ', environment);
 
     if (environment == 'SKAD3') {
       envURL =
@@ -90,6 +90,10 @@ class GrnChangeReceipt extends Component {
       envURL = 'https://ptest2a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       console.log('New ENV URL ', envURL);
       this.api = new API.create(envURL);
+    } else if (environment == 'PDEV1') {
+      envURL = 'https://pdev1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
     } else if (environment == 'PDEV2') {
       envURL = 'https://pdev2a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
@@ -166,16 +170,16 @@ class GrnChangeReceipt extends Component {
     this.setState({isLoading: true});
     console.log('Image data', this.data);
 
-    await DBGrnReceiptDataHelper.updateReceiptStatus(
-      this.state.entityReceipt.order_number,
-      this.state.entityReceipt.order_line_number,
-      this.state.entityReceipt.receipt_num,
-      this.photoURI,
-      this.state.comment,
-      'pending',
-      new Date(),
-      this.state.quantity,
-    );
+    // await DBGrnReceiptDataHelper.updateReceiptStatus(
+    //   this.state.entityReceipt.order_number,
+    //   this.state.entityReceipt.order_line_number,
+    //   this.state.entityReceipt.receipt_num,
+    //   this.photoURI,
+    //   this.state.comment,
+    //   'pending',
+    //   new Date(),
+    //   this.state.quantity,
+    // );
 
     const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
     const params = [username, 'testPhotoName', this.data];
@@ -186,26 +190,32 @@ class GrnChangeReceipt extends Component {
       if (result.ok) {
         console.log('Response API ok: ', result.data);
         this.file_id = result.data.REQUEST_ID;
+
+        console.log('Response API ok:???>>>>> ', result.data);
         //update file id to local
-        let updatedReceipt = await this.updateChangeReceipt(
-          this.receipt_id,
-          this.file_id,
-        );
+        // let updatedReceipt = await this.updateChangeReceipt(
+        //   this.receipt_id,
+        //   this.file_id,
+        // );
+        let updatedReceipt = this.state.entityReceipt;
         //call change receipt API
         this.postCorrectReceipt(
           updatedReceipt.order_number,
           updatedReceipt.order_line_number,
-          updatedReceipt.quantity,
+          // updatedReceipt.quantity,
+          this.state.correctedQuantity,
           updatedReceipt.unit_of_measure,
           updatedReceipt.item_number,
           updatedReceipt.item_description,
           updatedReceipt.to_organization,
-          updatedReceipt.comments,
+          // updatedReceipt.comments,
+          this.state.comment,
           updatedReceipt.receipt_num,
           updatedReceipt.deliver_tran_id,
           updatedReceipt.receive_tran_id,
           updatedReceipt.type,
-          updatedReceipt.file_id,
+          // updatedReceipt.file_id,
+          result.data.REQUEST_ID,
           this.receipt_id,
         );
       } else {
@@ -258,19 +268,19 @@ class GrnChangeReceipt extends Component {
 
     setTimeout(async () => {
       if (response.ok) {
-        console.log('Response API ok: ', response.data);
+        console.log('Response API ok: 267', response.data);
 
-        this.deleteChangeReceipt(receipt_id);
-        await DBGrnReceiptDataHelper.updateReceiptStatus(
-          order_number,
-          order_line_number,
-          receipt_num,
-          this.photoURI,
-          comments,
-          'processing',
-          new Date(),
-          quantity,
-        );
+        // this.deleteChangeReceipt(receipt_id);
+        // await DBGrnReceiptDataHelper.updateReceiptStatus(
+        //   order_number,
+        //   order_line_number,
+        //   receipt_num,
+        //   this.photoURI,
+        //   comments,
+        //   'processing',
+        //   new Date(),
+        //   quantity,
+        // );
 
         Alert.alert(
           '',
@@ -313,16 +323,16 @@ class GrnChangeReceipt extends Component {
     this.setState({isLoading: true});
 
     //To Do : save receipt Data
-    await DBGrnReceiptDataHelper.updateReceiptStatus(
-      order_number,
-      order_line_number,
-      receipt_num,
-      null,
-      comments,
-      'pending',
-      new Date(),
-      quantity,
-    );
+    // await DBGrnReceiptDataHelper.updateReceiptStatus(
+    //   order_number,
+    //   order_line_number,
+    //   receipt_num,
+    //   null,
+    //   comments,
+    //   'pending',
+    //   new Date(),
+    //   quantity,
+    // );
 
     const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
     const response = await this.api.postCorrectReceipt(
@@ -346,19 +356,19 @@ class GrnChangeReceipt extends Component {
 
     setTimeout(async () => {
       if (response.ok) {
-        console.log('Response API ok: ', response.data);
+        console.log('Response API ok: 355', response.data);
 
-        this.deleteChangeReceipt(receipt_id);
-        await DBGrnReceiptDataHelper.updateReceiptStatus(
-          order_number,
-          order_line_number,
-          receipt_num,
-          null,
-          comments,
-          'processing',
-          new Date(),
-          quantity,
-        );
+        // this.deleteChangeReceipt(receipt_id);
+        // await DBGrnReceiptDataHelper.updateReceiptStatus(
+        //   order_number,
+        //   order_line_number,
+        //   receipt_num,
+        //   null,
+        //   comments,
+        //   'processing',
+        //   new Date(),
+        //   quantity,
+        // );
 
         Alert.alert(
           '',
@@ -403,7 +413,8 @@ class GrnChangeReceipt extends Component {
         this.setState({
           img: source,
         });
-        this.photoURI = res && res.assets && res.assets.length > 0 && res.assets[0].uri;
+        this.photoURI =
+          res && res.assets && res.assets.length > 0 && res.assets[0].uri;
         this.data = new FormData();
         this.data.append('photo', {
           uri: res && res.assets && res.assets.length > 0 && res.assets[0].uri,
@@ -517,11 +528,11 @@ class GrnChangeReceipt extends Component {
         this.state.entityReceipt.quantity - this.state.quantity,
     });
 
-    this.saveChangeReceipt(
-      this.state.comment,
-      this.photoURI,
-      this.state.correctedQuantity,
-    );
+    // this.saveChangeReceipt(
+    //   this.state.comment,
+    //   this.photoURI,
+    //   this.state.correctedQuantity,
+    // );
 
     if (
       this.photoURI != undefined &&
@@ -532,7 +543,7 @@ class GrnChangeReceipt extends Component {
       //send file API
       this.sendFile();
     } else {
-      receipt = this.state.entityReceipt;
+      let receipt = this.state.entityReceipt;
 
       this.postCorrectReceiptWithoutPhoto(
         receipt.order_number,

@@ -28,7 +28,12 @@ export default EnvironmentVar = async() => {
     envURL = "https://ptest2a1-inoapps4.inoapps.com/ords/inoapps_ec/";
     console.log("New ENV URL ", envURL);
     Api.create(envURL);
-  } else if (environment == "PDEV2") {
+  }
+  else if (environment == 'PDEV1') {
+    envURL = 'https://pdev1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+    console.log('New ENV URL ', envURL);
+    Api.create(envURL);
+  }  else if (environment == "PDEV2") {
     envURL = "https://pdev2a1-inoapps4.inoapps.com/ords/inoapps_ec/";
     console.log("New ENV URL ", envURL);
     Api.create(envURL);

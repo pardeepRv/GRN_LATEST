@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, {Component} from 'react';
 import {
   View,
   Text,
@@ -8,29 +8,29 @@ import {
   Image,
   TouchableHighlight,
   ActivityIndicator,
-} from "react-native";
-import { connect } from "react-redux";
-import { Images } from "../Themes";
-import GrnPurchaseOrderDetails from "././GrnPurchaseOrderDetails";
-import DBGrnPurchaseOrderDataHelper from "../DB/DBGrnPurchaseOrderDataHelper";
-import AppConfig from "../Config/AppConfig";
-import Spinner from "react-native-loading-spinner-overlay";
-import Utils from "../Utils/Utils";
-import { NavigationEvents } from "react-navigation";
+} from 'react-native';
+import {connect} from 'react-redux';
+import {Images} from '../Themes';
+import GrnPurchaseOrderDetails from '././GrnPurchaseOrderDetails';
+import DBGrnPurchaseOrderDataHelper from '../DB/DBGrnPurchaseOrderDataHelper';
+import AppConfig from '../Config/AppConfig';
+import Spinner from 'react-native-loading-spinner-overlay';
+import Utils from '../Utils/Utils';
+import {NavigationEvents} from 'react-navigation';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
 // Styles
-import styles from "./Styles/GrnPurchaseOrderStyle";
+import styles from './Styles/GrnPurchaseOrderStyle';
 
 // For API
-import API from "../../App/Services/Api";
-import FJSON from "format-json";
+import API from '../../App/Services/Api';
+import FJSON from 'format-json';
 
 class GrnPurchaseOrder extends React.PureComponent {
   api = {};
   static navigationOptions = {
-    title: "PURCHASE ORDER",
+    title: 'PURCHASE ORDER',
   };
 
   constructor(props) {
@@ -42,7 +42,7 @@ class GrnPurchaseOrder extends React.PureComponent {
       filteredPurchaseOrders: [],
       dataObjects: [],
       finalPOToDisplay: [],
-      envURL: "",
+      envURL: '',
     };
   }
 
@@ -60,54 +60,58 @@ class GrnPurchaseOrder extends React.PureComponent {
       isLoading: false,
     });
 
-    const environment = await Utils.retrieveDataFromAsyncStorage("ENVIRONMENT");
-    console.log("Environment Variable (API) ", environment);
+    const environment = await Utils.retrieveDataFromAsyncStorage('ENVIRONMENT');
+    console.log('Environment Variable (API) ', environment);
     //console.tron.log("Original baseURL", API.create(baseURL));
     // envURL = "";
-    if (environment == "SKAD3") {
-      console.log("INTO IF");
+    if (environment == 'SKAD3') {
+      console.log('INTO IF');
       envURL =
-        "https://skad3a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/";
-      console.log("New ENV URL ", envURL);
+        'https://skad3a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      console.log('New ENV URL ', envURL);
       //this.api = new API.create(envURL);
-      console.log(this.api, "LETS GOOOO");
-    } else if (environment == "SKAD2") {
+      console.log(this.api, 'LETS GOOOO');
+    } else if (environment == 'SKAD2') {
       envURL =
-        "https://skad2a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/";
-      console.log("New ENV URL ", envURL);
+        'https://skad2a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      console.log('New ENV URL ', envURL);
       // this.api = new API.create(envURL);
-    } else if (environment == "SKAD1") {
+    } else if (environment == 'SKAD1') {
       envURL =
-        "https://skad1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/";
-      console.log("New ENV URL ", envURL);
+        'https://skad1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      console.log('New ENV URL ', envURL);
       //this.api = new API.create(envURL);
-    } else if (environment == "SKAT1") {
+    } else if (environment == 'SKAT1') {
       envURL =
-        "https://skat1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/";
-      console.log("New ENV URL ", envURL);
+        'https://skat1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      console.log('New ENV URL ', envURL);
       //this.api = new API.create(envURL);
-    } else if (environment == "PTEST2") {
-      envURL = "https://ptest2a1-inoapps4.inoapps.com/ords/inoapps_ec/";
-      console.log("New ENV URL ", envURL);
+    } else if (environment == 'PTEST2') {
+      envURL = 'https://ptest2a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      console.log('New ENV URL ', envURL);
       //this.api = new API.create(envURL);
-    } else if (environment == "PDEV2") {
-      envURL = "https://pdev2a1-inoapps4.inoapps.com/ords/inoapps_ec/";
+    } else if (environment == 'PDEV1') {
+      envURL = 'https://pdev1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
-      console.log("New ENV URL RECEIPTS ", envURL);
-    } else if (environment == "PTEST1") {
-      envURL = "https://ptest1a1-inoapps4.inoapps.com/ords/inoapps_ec/";
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'PDEV2') {
+      envURL = 'https://pdev2a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
-      console.log("New ENV URL RECEIPTS ", envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'PTEST1') {
+      envURL = 'https://ptest1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      // this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
     }
 
     const api = API.create(envURL);
-    console.log("New ENV URL PO WORKING??? ", envURL);
+    console.log('New ENV URL PO WORKING??? ', envURL);
 
-    const username = await Utils.retrieveDataFromAsyncStorage("USER_NAME");
-    console.log(username, "username is storage>>>>");
+    const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
+    console.log(username, 'username is storage>>>>');
     const response = await api.getPurchaseOrders(username);
     const purchaseOrders = response.data.items;
-    console.log("Purchase Orders first>>>: ", purchaseOrders);
+    console.log('Purchase Orders first>>>: ', purchaseOrders);
 
     // Save to DB
     // await DBGrnPurchaseOrderDataHelper.savePurchaseOrders(purchaseOrders);
@@ -151,17 +155,17 @@ class GrnPurchaseOrder extends React.PureComponent {
       dataObjects: [],
     });
 
-    ordersGettingFromApi.map((po) => {
-      console.log("coming in po new method", po);
+    ordersGettingFromApi.map(po => {
+      console.log('coming in po new method', po);
       // filter out the status close po
-      if (po.header_status.toUpperCase() == "OPEN") {
+      if (po.header_status.toUpperCase() == 'OPEN') {
         if (po.quantity_available_to_receive > 0) {
           this.state.filteredPurchaseOrders.push(po);
         } else {
-          console.log("sufficient quantity_available_to_receive");
+          console.log('sufficient quantity_available_to_receive');
         }
       } else {
-        console.log("CLOSED FOR RECEIVING");
+        console.log('CLOSED FOR RECEIVING');
       }
     });
 
@@ -172,7 +176,7 @@ class GrnPurchaseOrder extends React.PureComponent {
     for (let i = 0; i < test.length; i++) {
       let po = test[i];
       if (this.checkPONoExist(this.state.finalPOToDisplay, po)) {
-        console.log("Existing");
+        console.log('Existing');
       } else {
         console.log(po);
         final.push(po);
@@ -186,9 +190,9 @@ class GrnPurchaseOrder extends React.PureComponent {
       },
       async () => {
         await DBGrnPurchaseOrderDataHelper.savePurchaseOrders(
-          ordersGettingFromApi
+          ordersGettingFromApi,
         );
-      }
+      },
     );
   }
 
@@ -202,19 +206,19 @@ class GrnPurchaseOrder extends React.PureComponent {
     let dbPurchaseOrders =
       await DBGrnPurchaseOrderDataHelper.getPurchaseOrders();
 
-    console.log("DB purchase order: ", dbPurchaseOrders);
+    console.log('DB purchase order: ', dbPurchaseOrders);
 
-    dbPurchaseOrders.map((po) => {
-      console.log("coming in po", po);
+    dbPurchaseOrders.map(po => {
+      console.log('coming in po', po);
       // filter out the status close po
-      if (po.header_status.toUpperCase() == "OPEN") {
+      if (po.header_status.toUpperCase() == 'OPEN') {
         if (po.quantity_available_to_receive > 0) {
           this.state.filteredPurchaseOrders.push(po);
         } else {
-          console.log("sufficient quantity_available_to_receive");
+          console.log('sufficient quantity_available_to_receive');
         }
       } else {
-        console.log("CLOSED FOR RECEIVING");
+        console.log('CLOSED FOR RECEIVING');
       }
     });
 
@@ -225,7 +229,7 @@ class GrnPurchaseOrder extends React.PureComponent {
     for (let i = 0; i < test.length; i++) {
       let po = test[i];
       if (this.checkPONoExist(this.state.finalPOToDisplay, po)) {
-        console.log("Existing");
+        console.log('Existing');
       } else {
         console.log(po);
         final.push(po);
@@ -257,7 +261,7 @@ class GrnPurchaseOrder extends React.PureComponent {
     quantity,
     quantity_received,
     comments,
-    photoURL
+    photoURL,
   ) {
     await DBGrnPurchaseOrderDataHelper.updatePOStatus(
       order_number,
@@ -269,7 +273,7 @@ class GrnPurchaseOrder extends React.PureComponent {
       quantity,
       quantity_received,
       comments,
-      photoURL
+      photoURL,
     );
   }
 
@@ -294,15 +298,15 @@ class GrnPurchaseOrder extends React.PureComponent {
   * e.g.
     return <MyCustomCell title={item.title} description={item.description} />
   *************************************************************/
-  renderRow = ({ item }) => {
+  renderRow = ({item}) => {
     return (
       <TouchableHighlight
         onPress={() => {
-          this.props.navigation.navigate("GrnPurchaseOrderDetails", {
+          this.props.navigation.navigate('GrnPurchaseOrderDetails', {
             entityPurchaseOrder: item,
+            dataObjects: this.state.dataObjects,
           });
-        }}
-      >
+        }}>
         <View>
           <View style={styles.row}>
             <View style={styles.rowSection1}>
@@ -360,8 +364,8 @@ class GrnPurchaseOrder extends React.PureComponent {
     return (
       <View style={styles.container}>
         <NavigationEvents
-          onWillFocus={(payload) => {
-            console.log("will focus", payload);
+          onWillFocus={payload => {
+            console.log('will focus', payload);
             this.refreshPayload();
           }}
         />
@@ -369,8 +373,7 @@ class GrnPurchaseOrder extends React.PureComponent {
 
         <ImageBackground
           source={Images.grnPurchaseOrderBackground}
-          style={styles.backgroundImage}
-        >
+          style={styles.backgroundImage}>
           <View style={styles.header}>
             <View style={styles.headerSection1}>
               <Text style={styles.headerLabel}>Order No</Text>
@@ -399,13 +402,13 @@ class GrnPurchaseOrder extends React.PureComponent {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     // ...redux state to props here
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {};
 };
 

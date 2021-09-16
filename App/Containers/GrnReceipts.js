@@ -93,6 +93,10 @@ class GrnReceipts extends Component {
       envURL = 'https://ptest2a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       console.log('New ENV URL ', envURL);
       //this.api = new API.create(envURL);
+    } else if (environment == 'PDEV1') {
+      envURL = 'https://pdev1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      // this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
     } else if (environment == 'PDEV2') {
       envURL = 'https://pdev2a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
@@ -110,16 +114,16 @@ class GrnReceipts extends Component {
     const receipts = response.data.items;
     console.log('Receipts: ', receipts);
 
-    // let arr=[];
-    // receipts.map(receipt => {
-    //   if (receipt.quantity > 0) {
-    //     arr.push(receipt);
-    //   }
-    // });
-    // this.setState({
-    //   dataObjects:arr
-    // })
-    // return;
+    let arr = [];
+    receipts.map(receipt => {
+      if (receipt.quantity > 0) {
+        arr.push(receipt);
+      }
+    });
+    this.setState({
+      dataObjects: arr,
+    });
+    return;
 
     // Save to DB
     await DBGrnReceiptDataHelper.saveReceipts(receipts);
@@ -146,7 +150,6 @@ class GrnReceipts extends Component {
         this.state.dataObjects.push(receipt);
       }
     });
-   
   }
 
   /************************************************************

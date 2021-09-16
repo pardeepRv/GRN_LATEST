@@ -8075,9 +8075,9 @@
     "node-fetch" "^2.6.0"
 
 "realm@^10.6.0":
-  "integrity" "sha512-BsbfQsSOwbmscpuQs4dzCadr/bH63Yo35pC9/SKzkeNndtTHHi714IGNOYya0l60mH8kcwFCZb+d9n6tcJgZxQ=="
-  "resolved" "https://registry.npmjs.org/realm/-/realm-10.7.0.tgz"
-  "version" "10.7.0"
+  "integrity" "sha512-mrQEHf5dfSZVEE3Ol4L2Ulhl8I1z4IytZuB/tTH4sG/jAG21wuN4JJPmp81hiNf5/PtekN+3I55w0ix/r4vSWQ=="
+  "resolved" "https://registry.npmjs.org/realm/-/realm-10.8.0.tgz"
+  "version" "10.8.0"
   dependencies:
     "bindings" "^1.5.0"
     "bson" "4.4.1"

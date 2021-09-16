@@ -33,23 +33,25 @@ let CreateReceiptsAPIHelper = {
 
     const api = API.create(enVar);
     const response = await api.postCreateReceipt(username, params);
+    console.log(response,'getting response>>>>> 36');
 
     if (response.ok) {
-      receipts.map(async (receipt) => {
-        await DBGrnPurchaseOrderDataHelper.updatePOStatusToProcessing(
-          receipt.order_number,
-          receipt.distribution_number,
-          receipt.order_line_number,
-          false,
-          "processing",
-          new Date()
-        );
-        await DBGrnPurchaseOrderDataHelper.deleteCreateReceipts(
-          receipt.order_number,
-          receipt.distribution_number,
-          receipt.order_line_number
-        );
-      });
+      // receipts.map(async (receipt) => {
+      //   await DBGrnPurchaseOrderDataHelper.updatePOStatusToProcessing(
+      //     receipt.order_number,
+      //     receipt.distribution_number,
+      //     receipt.order_line_number,
+      //     false,
+      //     "processing",
+      //     new Date()
+      //   );
+      //   await DBGrnPurchaseOrderDataHelper.deleteCreateReceipts(
+      //     receipt.order_number,
+      //     receipt.distribution_number,
+      //     receipt.order_line_number
+      //   );
+      // });
+      // alert('successfully submitted.')
     } else {
       console.log(
         "Response API: failed",

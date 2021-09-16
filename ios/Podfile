@@ -12,6 +12,8 @@ target 'GRNInoApp' do
     :hermes_enabled => false
   )
 
+  # pod 'RealmJS', :path => '../node_modules/realm/src'
+
   target 'GRNInoAppTests' do
     inherit! :complete
     # Pods for testing
