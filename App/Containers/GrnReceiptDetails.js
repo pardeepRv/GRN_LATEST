@@ -601,7 +601,7 @@ class GrnReceiptDetails extends Component {
                       editable={false}
                       selectTextOnFocus={false}
                       marginTop={10}
-                      maxLength={40}
+                      maxLength={80}
                       marginBottom={15}
                       marginLeft={5}
                       fontSize={12}
@@ -720,7 +720,7 @@ class GrnReceiptDetails extends Component {
                       onChangeText={text => this.setState({comments: text})}
                       multiline={true}
                       marginTop={10}
-                      maxLength={40}
+                      maxLength={80}
                       marginBottom={15}
                       marginLeft={5}
                       fontSize={12}

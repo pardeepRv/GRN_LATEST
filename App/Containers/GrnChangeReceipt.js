@@ -106,6 +106,33 @@ class GrnChangeReceipt extends Component {
       envURL = 'https://ptest1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'PDEV3') {
+      envURL = 'https://pdev3a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'PTEST3') {
+      envURL = 'https://ptest3a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'PDEMO') {
+      envURL = 'https://pdemo1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'SKAD4') {
+      envURL =
+        'https://skad4a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'SKAD5') {
+      envURL =
+        'https://skad5a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'SKAP') {
+      envURL =
+        'https://skap1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
     }
   }
 
@@ -625,7 +652,7 @@ class GrnChangeReceipt extends Component {
                     placeholder="ADD COMMENTS"
                     onChangeText={comment => this.setState({comment})}
                     multiline={true}
-                    maxLength={40}
+                    maxLength={80}
                     marginTop={10}
                     marginBottom={15}
                     marginLeft={5}

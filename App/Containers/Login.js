@@ -41,19 +41,19 @@ class Login extends Component {
     this.state = {
       // username: "RVTechnologies.User1",
       // password: "D3v3l0PmenT1",
-      // environment: "PTEST1",
+      // environment: "PDEV2",
 
       // username: "PROC_EMP",
       // password: "Skanska123",
       // environment: "SKAD3",
 
-      username: 'Products.User',
-      password: 'Welcome41',
-      environment: 'PDEV1',
+      // username: 'Products.User',
+      // password: 'Welcome41',
+      // environment: 'PDEV1',
 
-      // username: "",
-      // password: "",
-      // environment: "",
+      username: "",
+      password: "",
+      environment: "",
       envURL: '',
       isLoading: false,
       isChecked: false,
@@ -110,17 +110,43 @@ class Login extends Component {
         envURL = 'https://ptest2a1-inoapps4.inoapps.com/ords/inoapps_ec/';
         console.log('New ENV URL ', envURL);
         this.api = new API.create(envURL);
-      }
-      else if (environment == 'PDEV1') {
+      } else if (environment == 'PDEV1') {
         envURL = 'https://pdev1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
         console.log('New ENV URL ', envURL);
         this.api = new API.create(envURL);
-      }  else if (environment == 'PDEV2') {
+      } else if (environment == 'PDEV2') {
         envURL = 'https://pdev2a1-inoapps4.inoapps.com/ords/inoapps_ec/';
         console.log('New ENV URL ', envURL);
         this.api = new API.create(envURL);
       } else if (environment == 'PTEST1') {
         envURL = 'https://ptest1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+        console.log('New ENV URL ', envURL);
+        this.api = new API.create(envURL);
+      } else if (environment == 'PDEV3') {
+        envURL = 'https://pdev3a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+        console.log('New ENV URL ', envURL);
+        this.api = new API.create(envURL);
+      } else if (environment == 'PTEST3') {
+        envURL = 'https://ptest3a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+        console.log('New ENV URL ', envURL);
+        this.api = new API.create(envURL);
+      } else if (environment == 'PDEMO') {
+        envURL = 'https://pdemo1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+        console.log('New ENV URL ', envURL);
+        this.api = new API.create(envURL);
+      } else if (environment == 'SKAD4') {
+        envURL =
+          'https://skad4a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+        console.log('New ENV URL ', envURL);
+        this.api = new API.create(envURL);
+      } else if (environment == 'SKAD5') {
+        envURL =
+          'https://skad5a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+        console.log('New ENV URL ', envURL);
+        this.api = new API.create(envURL);
+      } else if (environment == 'SKAP') {
+        envURL =
+          'https://skap1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
         console.log('New ENV URL ', envURL);
         this.api = new API.create(envURL);
       } else {

@@ -105,6 +105,33 @@ class GrnReceipts extends Component {
       envURL = 'https://ptest1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'PDEV3') {
+      envURL = 'https://pdev3a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      // this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'PTEST3') {
+      envURL = 'https://ptest3a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      // this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'PDEMO') {
+      envURL = 'https://pdemo1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      // this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'SKAD4') {
+      envURL =
+        'https://skad4a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      // this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'SKAD5') {
+      envURL =
+        'https://skad5a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'SKAP') {
+      envURL =
+        'https://skap1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
     }
 
     const api = API.create(envURL);
@@ -122,6 +149,8 @@ class GrnReceipts extends Component {
     });
     this.setState({
       dataObjects: arr,
+      isLoading: false,
+
     });
     return;
 
@@ -330,7 +359,19 @@ class GrnReceipts extends Component {
             renderItem={this.renderRow}
             keyExtractor={this.keyExtractor}
             initialNumToRender={this.oneScreensWorth}
-            ListHeaderComponent={this.renderHeader}
+            // ListHeaderComponent={this.renderHeader}
+            // ListHeaderComponent={() =>
+            //   !this.state.dataObjects.length ? (
+            //     <Text
+            //       style={{
+            //         textAlign: 'center',
+            //         marginTop: 20,
+            //         fontWeight:'bold'
+            //       }}>
+            //       Recipts not found!
+            //     </Text>
+            //   ) : null
+            // }
             ListFooterComponent={this.renderFooter}
             ListEmptyComponent={this.renderEmpty}
             ItemSeparatorComponent={this.renderSeparator}

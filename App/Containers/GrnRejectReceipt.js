@@ -110,13 +110,11 @@ class GrnRejectReceipt extends Component {
       envURL = 'https://ptest2a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       console.log('New ENV URL ', envURL);
       this.api = new API.create(envURL);
-    }
-    else if (environment == 'PDEV1') {
+    } else if (environment == 'PDEV1') {
       envURL = 'https://pdev1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
-    } 
-    else if (environment == 'PDEV2') {
+    } else if (environment == 'PDEV2') {
       envURL = 'https://pdev2a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
@@ -126,6 +124,33 @@ class GrnRejectReceipt extends Component {
       console.log('New ENV URL RECEIPTS ', envURL);
     } else if (environment == 'PTEST1') {
       envURL = 'https://ptest1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'PDEV3') {
+      envURL = 'https://pdev3a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'PTEST3') {
+      envURL = 'https://ptest3a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'PDEMO') {
+      envURL = 'https://pdemo1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'SKAD4') {
+      envURL =
+        'https://skad4a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'SKAD5') {
+      envURL =
+        'https://skad5a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    } else if (environment == 'SKAP') {
+      envURL =
+        'https://skap1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
     }
@@ -235,6 +260,8 @@ class GrnRejectReceipt extends Component {
     this.setState({isLoading: false});
 
     setTimeout(async () => {
+        console.log('Response API ok:231 ', result.data);
+
       if (result.ok) {
         console.log('Response API ok:231 ', result.data);
 
@@ -440,7 +467,6 @@ class GrnRejectReceipt extends Component {
       }
     }, 100);
   }
-
 
   imageGalleryLaunch = () => {
     let options = {
@@ -716,7 +742,7 @@ class GrnRejectReceipt extends Component {
                     onChangeText={comment => this.setState({comment})}
                     multiline={true}
                     marginTop={10}
-                    maxLength={40}
+                    maxLength={80}
                     marginBottom={15}
                     marginLeft={5}
                     fontSize={12}
