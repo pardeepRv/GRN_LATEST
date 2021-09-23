@@ -347,7 +347,24 @@ class GrnChangeReceipt extends Component {
     file_id,
     receipt_id,
   ) {
-    this.setState({isLoading: true});
+    console.log(
+      order_number,
+      order_line_number,
+      quantity,
+      unit_of_measure,
+      item_number,
+      item_description,
+      to_organization,
+      comments,
+      receipt_num,
+      deliver_tran_id,
+      receive_tran_id,
+      type,
+      file_id,
+      receipt_id,
+      'result>>>>>>>>>>>>>',
+    );
+      this.setState({isLoading: false});
 
     //To Do : save receipt Data
     // await DBGrnReceiptDataHelper.updateReceiptStatus(
@@ -546,13 +563,13 @@ class GrnChangeReceipt extends Component {
   _submit = () => {
     console.log(this.state.quantity, 'this.state.quantity is>>>');
     console.log(
-      this.state.entityReceipt.quantity - this.state.quantity,
+      this.state.quantity - this.state.entityReceipt.quantity,
       'this.state.quantity is 111>>>',
     );
     //save to local
     this.setState({
       correctedQuantity:
-        this.state.entityReceipt.quantity - this.state.quantity,
+        this.state.quantity - this.state.entityReceipt.quantity,
     });
 
     // this.saveChangeReceipt(

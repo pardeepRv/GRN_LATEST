@@ -685,13 +685,22 @@ class GrnReceiptDetails extends Component {
                   </View>
                   <View style={styles.lastPinkInfoContainer}>
                     <Text style={styles.infoTextLeft}>Open Quantity</Text>
-                    {/* <Text style={styles.infoText}>{this.state.entityPurchaseOrder.quantity_available_to_receive - this.state.entityPurchaseOrder.quantity_received}</Text>
-                     */}
+                    {/* <Text style={styles.infoText}>
+                      {this.state.entityPurchaseOrder
+                        .quantity_available_to_receive -
+                        this.state.entityPurchaseOrder.quantity_received}
+                    </Text> */}
 
-                    <Text style={styles.infoText}>
+                    {/* <Text style={styles.infoText}>
                       {this.state.entityPurchaseOrder.quantity_ordered -
                         this.state.entityPurchaseOrder
                           .quantity_available_to_receive}
+                    </Text> */}
+                    <Text style={styles.infoText}>
+                      {
+                        this.state.entityPurchaseOrder
+                          .quantity_available_to_receive
+                      }
                     </Text>
                   </View>
                 </View>

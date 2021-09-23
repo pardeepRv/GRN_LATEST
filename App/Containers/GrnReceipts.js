@@ -147,11 +147,18 @@ class GrnReceipts extends Component {
         arr.push(receipt);
       }
     });
-    this.setState({
-      dataObjects: arr,
-      isLoading: false,
 
-    });
+    if(arr && arr.length>0){
+      let sortedProductsAsc;
+
+      sortedProductsAsc= arr.sort((a, b) => b.order_number.localeCompare(a.order_number))
+     
+      this.setState({
+        dataObjects: sortedProductsAsc,
+        isLoading: false,
+      });
+    }
+   
     return;
 
     // Save to DB

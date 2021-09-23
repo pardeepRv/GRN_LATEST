@@ -119,7 +119,12 @@ class GrnPurchaseOrderDetails extends Component {
     // Retrieve from DB
 
     this.props.navigation.state.params.dataObjects.map(orderLine => {
-      if (orderLine.quantity_available_to_receive > 0) {
+      if (
+        orderLine.quantity_available_to_receive > 0 &&
+        this.state.entityPurchaseOrder.order_number == orderLine.order_number
+        // ||
+        // this.state.entityPurchaseOrder.supplier_number == orderLine.supplier_number
+      ) {
         this.state.filteredOrderLines.push(orderLine);
       }
     });
@@ -158,10 +163,9 @@ class GrnPurchaseOrderDetails extends Component {
     //   this.state.entityPurchaseOrder.order_number,
     // );
 
-    let dbCreateReceipts =
-      this.props.navigation.state.params.dataObjects.filter((val, i) => {
-        return val.order_number == this.state.entityPurchaseOrder.order_number;
-      });
+    let dbCreateReceipts = this.state.dataObjects.filter((val, i) => {
+      return val.order_number == this.state.entityPurchaseOrder.order_number;
+    });
     console.log(
       'createReceipts retrieved from DB: need to check ',
       dbCreateReceipts,
@@ -174,21 +178,36 @@ class GrnPurchaseOrderDetails extends Component {
   }
 
   returnData(edited, comments, photoURL, quantity, index) {
+    console.log(
+      edited,
+      comments,
+      photoURL,
+      quantity,
+      index,
+      'edited, comments, photoURL, quantity, index',
+    );
     let updatedData = [...this.state.dataObjects];
     updatedData[index] = {
       ...updatedData[index],
       edited: edited,
       comments: comments,
       photoURL: photoURL,
-      quantity_received: quantity,
+      quantity_received: parseInt(quantity),
     };
-    this.setState({dataObjects: updatedData});
+    this.setState({
+      dataObjects: updatedData,
+      createReceiptObjects: this.state.dataObjects,
+    });
   }
 
   refreshStatus(submitStatus, index) {
+    console.log(submitStatus, index, 'submitStatus, index');
     let updatedData = [...this.state.dataObjects];
     updatedData[index] = {...updatedData[index], submitStatus: submitStatus};
-    this.setState({dataObjects: updatedData});
+    this.setState({
+      dataObjects: updatedData,
+      createReceiptObjects: this.state.dataObjects,
+    });
   }
 
   submitAllCreateReceiptsAlert = async () => {
@@ -204,7 +223,7 @@ class GrnPurchaseOrderDetails extends Component {
   };
 
   submitAllCreateReceipts = async () => {
-    // await this.getCreateReceipts();
+    await this.getCreateReceipts();
     await this.saveCreateAllReceipt();
     await this.submitReceipt();
   };
@@ -236,7 +255,6 @@ class GrnPurchaseOrderDetails extends Component {
   };
 
   _submitReceiptAlert = () => {
-    
     if (this.state.createReceiptObjects.length > 0) {
       Alert.alert(
         'Submit Receipts?',
@@ -303,31 +321,44 @@ class GrnPurchaseOrderDetails extends Component {
   }
 
   async postCreateReceipt() {
-    console.log('Did Enter Post Create Receipt ');
+    console.log(
+      'Did Enter Post Create Receipt ',
+      this.state.createReceiptObjects.length,
+    );
     this.setState({isLoading: true});
 
-    // for (let i = 0; i < this.state.createReceiptObjects.length; i++) {
-    //   let entity = this.state.createReceiptObjects[i];
+    for (let i = 0; i < this.state.createReceiptObjects.length; i++) {
+      if (
+        this.state.createReceiptObjects[i].quantity &&
+        this.state.createReceiptObjects[i].quantity != null
+      ) {
+        this.state.createReceiptObjects[i].quantity =
+          this.state.createReceiptObjects[i].quantity;
+      } else {
+        this.state.createReceiptObjects[i].quantity =
+          this.state.createReceiptObjects[i].quantity_available_to_receive;
+      }
+      // let entity = this.state.createReceiptObjects[i];
 
-    //   console.log(entity.order_line_number, entity.distribution_number);
-    //   await DBGrnPurchaseOrderDataHelper.updateCreateReceiptStatus(
-    //     entity.order_number,
-    //     entity.distribution_number,
-    //     entity.order_line_number,
-    //     true,
-    //     'pending',
-    //     new Date(),
-    //     entity.quantity,
-    //   );
-    // }
+      // console.log(entity.order_line_number, entity.distribution_number);
+      // await DBGrnPurchaseOrderDataHelper.updateCreateReceiptStatus(
+      //   entity.order_number,
+      //   entity.distribution_number,
+      //   entity.order_line_number,
+      //   true,
+      //   'pending',
+      //   new Date(),
+      //   entity.quantity,
+      // );
+    }
 
-    console.log(' updated Receipts To Post ', this.state.createReceiptObjects);
+    console.log('updated Receipts To Post', this.state.createReceiptObjects);
 
     const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
     const response = await CreateReceiptsAPIHelper.postCreateReceipt(
       username,
       this.state.createReceiptObjects,
-      this.state.envUrl
+      this.state.envUrl,
     );
 
     this.setState({isLoading: false});
@@ -360,11 +391,15 @@ class GrnPurchaseOrderDetails extends Component {
     this.setState({isLoading: true});
     console.log('Image data', this.data);
     const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
+    this.api = API.create(this.state.envUrl);
+
     const params = [username, 'testPhotoName', this.data];
     let result = await this.api['postPhoto'].apply(this, params);
 
     this.setState({isLoading: false});
     setTimeout(async () => {
+      console.log('result of pic api ', result);
+
       if (result.ok) {
         console.log('Response API ok: ', result.data);
         this.file_id = result.data.REQUEST_ID;
@@ -397,9 +432,12 @@ class GrnPurchaseOrderDetails extends Component {
       }
     });
 
+    console.log(this.state.entireReceipts, 'saariya receiptss');
+
     if (this.state.entireReceipts.length > 0) {
       await this.state.entireReceipts.map(async item => {
         console.log('Submite Status: ', item.submitStatus);
+
         // Convert quantity string to number
         var quantityNum = parseFloat(item.quantity_available_to_receive);
 

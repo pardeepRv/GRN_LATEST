@@ -78,7 +78,7 @@ newURL = baseURL,
   const getReqHeaderLines = (username) => api.get("product.configurator.v1/getReqHeaderLines/" + username);
   const getStaticData = username => api.get("product.configurator.v1/getStaticData/" + username);
   const getReplaceReason = () => api.get("product.configurator.v1/getReplaceReason");
-  const postPhoto = (username, filename, photo) => api.post('grn.mobility.v1/postPhoto/' + username + ',' + filename, {photo});
+  const postPhoto = (username, filename, photo) => api.post('grn.mobility.v1/postPhoto/' + username + ',' + filename, photo);
   const postCreateReceipt = (username, receipts) => api.post('grn.mobility.v1/createReceipt/' + username , receipts);
   const postCorrectReceipt = (username, order_number, order_line_number, quantity, unit_of_measure, item_number, item_description, to_organization, comments, receipt_num,  deliver_tran_id, receive_tran_id, type, file_id) => api.post('grn.mobility.v1/correctReceipt/' + username , {order_number, order_line_number, quantity, unit_of_measure, item_number, item_description, to_organization, comments, receipt_num,  deliver_tran_id, receive_tran_id, type, file_id});
   const postRejectReceipt = (username, order_number, order_line_number, quantity, unit_of_measure, item_number, item_description, to_organization, comments, receipt_num, deliver_tran_id, receive_tran_id, type, file_id) => api.post('grn.mobility.v1/rejectReceipt/' + username , {order_number, order_line_number, quantity, unit_of_measure, item_number, item_description, to_organization, comments, receipt_num, deliver_tran_id, receive_tran_id, type, file_id});

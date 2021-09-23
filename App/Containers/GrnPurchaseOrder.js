@@ -43,6 +43,7 @@ class GrnPurchaseOrder extends React.PureComponent {
       dataObjects: [],
       finalPOToDisplay: [],
       envURL: '',
+      allObjectsSendingToNextPage: [],
     };
   }
 
@@ -102,7 +103,7 @@ class GrnPurchaseOrder extends React.PureComponent {
       envURL = 'https://ptest1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
-    }else if (environment == 'PDEV3') {
+    } else if (environment == 'PDEV3') {
       envURL = 'https://pdev3a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
@@ -148,7 +149,13 @@ class GrnPurchaseOrder extends React.PureComponent {
     });
 
     setTimeout(() => {
-      return this.directCallingAfterGettingApiRes(purchaseOrders);
+      let sortedProductsAsc;
+
+      sortedProductsAsc = purchaseOrders.sort((a, b) =>
+        b.order_number.localeCompare(a.order_number),
+      );
+
+      return this.directCallingAfterGettingApiRes(sortedProductsAsc);
       this.getDBGrnPurchaseOrder();
     }, 100);
 
@@ -177,6 +184,7 @@ class GrnPurchaseOrder extends React.PureComponent {
 
   async directCallingAfterGettingApiRes(ordersGettingFromApi) {
     this.setState({
+      allObjectsSendingToNextPage: ordersGettingFromApi,
       filteredPurchaseOrders: [],
       finalPOToDisplay: [],
       dataObjects: [],
@@ -331,7 +339,8 @@ class GrnPurchaseOrder extends React.PureComponent {
         onPress={() => {
           this.props.navigation.navigate('GrnPurchaseOrderDetails', {
             entityPurchaseOrder: item,
-            dataObjects: this.state.dataObjects,
+            // dataObjects: this.state.dataObjects,
+            dataObjects: this.state.allObjectsSendingToNextPage,
           });
         }}>
         <View>
