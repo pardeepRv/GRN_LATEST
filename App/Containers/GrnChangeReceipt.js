@@ -364,7 +364,8 @@ class GrnChangeReceipt extends Component {
       receipt_id,
       'result>>>>>>>>>>>>>',
     );
-      this.setState({isLoading: false});
+
+    this.setState({isLoading: false});
 
     //To Do : save receipt Data
     // await DBGrnReceiptDataHelper.updateReceiptStatus(
@@ -383,7 +384,7 @@ class GrnChangeReceipt extends Component {
       username,
       order_number,
       order_line_number,
-      Math.abs(quantity),
+      quantity,
       unit_of_measure,
       item_number,
       item_description,
@@ -566,6 +567,7 @@ class GrnChangeReceipt extends Component {
       this.state.quantity - this.state.entityReceipt.quantity,
       'this.state.quantity is 111>>>',
     );
+
     //save to local
     this.setState({
       correctedQuantity:

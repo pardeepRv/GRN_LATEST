@@ -11,7 +11,7 @@ let CreateReceiptsAPIHelper = {
       var param = {};
       param["order_number"] = receipt.order_number;
       param["order_line_number"] = receipt.order_line_number;
-      param["quantity"] = parseFloat(receipt.quantity);
+      param["quantity"] =  receipt.quantity;
       param["unit_of_measure"] = receipt.unit_of_measure;
       param["item_number"] = receipt.item_number;
       param["item_description"] = receipt.item_description;
@@ -29,7 +29,7 @@ let CreateReceiptsAPIHelper = {
       params.push(param);
     });
 
-    console.log("Params: ", params);
+    console.log("Params sending to api: ", params);
 
     const api = API.create(enVar);
     const response = await api.postCreateReceipt(username, params);

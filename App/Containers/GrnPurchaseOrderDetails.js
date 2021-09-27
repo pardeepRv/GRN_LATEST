@@ -261,7 +261,8 @@ class GrnPurchaseOrderDetails extends Component {
         'Are you sure you want to submit the receipts for all the selected purchase order lines?',
         [
           {text: 'Cancel', style: ''},
-          {text: 'OK', onPress: this.submitReceipt.bind(this)},
+          // {text: 'OK', onPress: this.submitReceipt.bind(this)},
+          {text: 'OK', onPress: this.submitSelectedReceiptOnly.bind(this)},
         ],
         {cancelable: false},
       );
@@ -272,6 +273,52 @@ class GrnPurchaseOrderDetails extends Component {
         [{text: 'OK'}],
         {cancelable: false},
       );
+    }
+  };
+
+  // for selected receipts only>>>>>>>>>>.
+  submitSelectedReceiptOnly = () => {
+    debugger
+    // this.setState({isLoading: true});
+
+    this.getCreateReceipts();
+    console.log(
+      'Print Create submitSelectedReceiptOnly:',
+      this.state.createReceiptObjects,
+    );
+
+    if (this.state.createReceiptObjects != null) {
+      for (let i = 0; i < this.state.createReceiptObjects.length; i++) {
+        let entity = this.state.createReceiptObjects[i];
+
+        if (entity && entity.edited) {
+          if (entity.photoURL != null && entity.photoURL != '') {
+            console.log('PRINT PHOTOURL: ', entity.photoURL);
+            let source = {
+              uri: entity.photoURL,
+            };
+            this.photoURL = entity.photoURL;
+            this.data = new FormData();
+            this.data.append('photo', {
+              uri: entity.photoURL,
+              type: 'image/jpeg', // or photo.type
+              name: 'testPhotoName',
+            });
+
+            // API.create(this.state.envUrl);
+            //send file API : upload image
+            this.uploadImage(entity.id);
+          } else {
+            this.state.currentNoOfReceiptsToPost++;
+            this.counterToCallCreateReceiptsAPI(
+              this.state.currentNoOfReceiptsToPost,
+              this.state.createReceiptObjects.length,
+            );
+          }
+        }
+      }
+    } else {
+      console.log('No Create Receipt in DB');
     }
   };
 
@@ -320,7 +367,53 @@ class GrnPurchaseOrderDetails extends Component {
     return dbCreateReceipt;
   }
 
+  // for submit selected items
+  async postCreateSelectedReceipt() {
+    console.log(
+      'Selected items Api hit',
+      this.state.createReceiptObjects.length,
+    );
+    this.setState({isLoading: false});
+
+    let updatedArr = [];
+
+    for (let i = 0; i < this.state.createReceiptObjects.length; i++) {
+      if (this.state.createReceiptObjects[i].edited) {
+        this.state.createReceiptObjects[i].quantity=this.state.createReceiptObjects[i].quantity_received;
+        updatedArr.push(this.state.createReceiptObjects[i]);
+      }
+    }
+
+      console.log('updated Receipts To Post updatedArr', updatedArr);
+
+    const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
+    const response = await CreateReceiptsAPIHelper.postCreateReceipt(
+      username,
+      updatedArr,
+      this.state.envUrl,
+    );
+
+    this.setState({isLoading: false});
+
+    setTimeout(() => {
+      if (response.ok) {
+        console.log('Print Receipts', updatedArr);
+        console.log('Response API ok: ', response.data);
+        // this.submitSuccessfulAlert();
+        alert('Receipts successfully submitted.')
+      } else {
+        console.log(
+          'Response API: failed',
+          response.status + ' - ' + response.problem,
+        );
+        this.submitFailedAlert();
+      }
+    }, 100);
+  }
+
   async postCreateReceipt() {
+    debugger;
+
     console.log(
       'Did Enter Post Create Receipt ',
       this.state.createReceiptObjects.length,
@@ -382,8 +475,11 @@ class GrnPurchaseOrderDetails extends Component {
     currentNoOfReceiptsToPost,
     totalReceiptsToPost,
   ) {
+    debugger;
     if (currentNoOfReceiptsToPost == totalReceiptsToPost) {
       this.postCreateReceipt();
+    } else {
+      this.postCreateSelectedReceipt();
     }
   }
 
