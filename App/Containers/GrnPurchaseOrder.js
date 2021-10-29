@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Text,
@@ -9,14 +9,14 @@ import {
   TouchableHighlight,
   ActivityIndicator,
 } from 'react-native';
-import {connect} from 'react-redux';
-import {Images} from '../Themes';
+import { connect } from 'react-redux';
+import { Images } from '../Themes';
 import GrnPurchaseOrderDetails from '././GrnPurchaseOrderDetails';
 import DBGrnPurchaseOrderDataHelper from '../DB/DBGrnPurchaseOrderDataHelper';
 import AppConfig from '../Config/AppConfig';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Utils from '../Utils/Utils';
-import {NavigationEvents} from 'react-navigation';
+import { NavigationEvents } from 'react-navigation';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
@@ -128,6 +128,12 @@ class GrnPurchaseOrder extends React.PureComponent {
     } else if (environment == 'SKAP') {
       envURL =
         'https://skap1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    }
+    else if (environment == 'GTDEV1') {
+      envURL =
+        'https://gtdev1a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
     }
@@ -333,7 +339,7 @@ class GrnPurchaseOrder extends React.PureComponent {
   * e.g.
     return <MyCustomCell title={item.title} description={item.description} />
   *************************************************************/
-  renderRow = ({item}) => {
+  renderRow = ({ item }) => {
     return (
       <TouchableHighlight
         onPress={() => {

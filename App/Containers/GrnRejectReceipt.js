@@ -153,6 +153,11 @@ class GrnRejectReceipt extends Component {
         'https://skap1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+    }else if (environment == 'GTDEV1') {
+      envURL =
+        'https://gtdev1a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
     }
   }
 

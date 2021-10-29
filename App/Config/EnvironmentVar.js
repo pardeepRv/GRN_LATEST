@@ -66,6 +66,11 @@ export default EnvironmentVar = async () => {
     console.log('New ENV URL ', envURL);
     Api.create(envURL);
   }
+  else if (environment == 'GTDEV1') {
+    envURL = 'https://gtdev1a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
+    console.log('New ENV URL ', envURL);
+    Api.create(envURL);
+  }
 
   return envURL;
 };

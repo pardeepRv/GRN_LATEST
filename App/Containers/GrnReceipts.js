@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Text,
@@ -9,16 +9,16 @@ import {
   ActivityIndicator,
   TouchableHighlight,
 } from 'react-native';
-import {connect} from 'react-redux';
-import {Images} from '../Themes';
+import { connect } from 'react-redux';
+import { Images } from '../Themes';
 import GrnEditReceipt from '././GrnEditReceipt';
 // import { StackNavigator } from "react-navigation";
-import {createStackNavigator} from 'react-navigation-stack';
+import { createStackNavigator } from 'react-navigation-stack';
 
 import DBGrnReceiptDataHelper from '../DB/DBGrnReceiptDataHelper';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Utils from '../Utils/Utils';
-import {NavigationEvents} from 'react-navigation';
+import { NavigationEvents } from 'react-navigation';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
@@ -133,6 +133,12 @@ class GrnReceipts extends Component {
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
     }
+    else if (environment == 'GTDEV1') {
+      envURL =
+        'https://gtdev1a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
+      this.api = new API.create(envURL);
+      console.log('New ENV URL RECEIPTS ', envURL);
+    }
 
     const api = API.create(envURL);
     console.log('New ENV URL RECEIPTS WORKING??? ', envURL);
@@ -148,17 +154,17 @@ class GrnReceipts extends Component {
       }
     });
 
-    if(arr && arr.length>0){
+    if (arr && arr.length > 0) {
       let sortedProductsAsc;
 
-      sortedProductsAsc= arr.sort((a, b) => b.order_number.localeCompare(a.order_number))
-     
+      sortedProductsAsc = arr.sort((a, b) => b.order_number.localeCompare(a.order_number))
+
       this.setState({
         dataObjects: sortedProductsAsc,
         isLoading: false,
       });
     }
-   
+
     return;
 
     // Save to DB
@@ -206,7 +212,7 @@ class GrnReceipts extends Component {
       return <MyCustomCell title={item.title} description={item.description} />
     *************************************************************/
 
-  renderRow = ({item, index}) => {
+  renderRow = ({ item, index }) => {
     if (item.submitStatus == 'processing') {
       return (
         <TouchableHighlight
