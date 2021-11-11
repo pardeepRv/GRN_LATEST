@@ -153,7 +153,7 @@ class GrnRejectReceipt extends Component {
         'https://skap1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
-    }else if (environment == 'GTDEV1') {
+    } else if (environment == 'GTDEV1') {
       envURL =
         'https://gtdev1a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
@@ -265,7 +265,7 @@ class GrnRejectReceipt extends Component {
     this.setState({isLoading: false});
 
     setTimeout(async () => {
-        console.log('Response API ok:231 ', result.data);
+      console.log('Response API ok:231 ', result.data);
 
       if (result.ok) {
         console.log('Response API ok:231 ', result.data);
@@ -699,14 +699,33 @@ class GrnRejectReceipt extends Component {
               <View style={styles.headerContainer}>
                 <View style={styles.lineWithBottomSpace} />
                 <View style={styles.greyInfoContainer}>
-                  <Text style={styles.infoTextLeft}>Item No</Text>
+                  <Text style={styles.infoTextLeft}>Order No.</Text>
                   <Text style={styles.infoText}>
                     {this.state.entityReceipt.order_number}
                   </Text>
                 </View>
-                <View style={styles.pinkInfoContainer}>
+                {/* <View style={styles.pinkInfoContainer}>
                   <Text style={styles.infoTextLeft}>Description</Text>
                   <Text style={styles.infoText}>
+                    {this.state.entityReceipt.item_description}
+                  </Text>
+                </View> */}
+                <View
+                  style={{
+                    padding: 10,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    backgroundColor: '#FCE8E7',
+                    alignItems: 'center',
+                  }}>
+                  <Text style={[styles.infoTextLeft, {paddingLeft: 10}]}>
+                    Description
+                  </Text>
+                  <Text
+                    style={[
+                      styles.infoText,
+                      {width: 110, alignSelf: 'center'},
+                    ]}>
                     {this.state.entityReceipt.item_description}
                   </Text>
                 </View>

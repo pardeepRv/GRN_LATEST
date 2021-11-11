@@ -83,15 +83,15 @@ class GrnSettings extends Component {
     this.props.navigation.navigate("Login");
   };
 
-  navigateBackToLogin = () => {
-    return this.props.navigation.navigate("Login");
+  // navigateBackToLogin = () => {
+  //   return this.props.navigation.navigate("Login");
 
-    const resetAction = StackActions.reset({
-      index: 0,
-      actions: [NavigationActions.navigate({ routeName: "loginStack" })],
-    });
-    return this.props.navigation.dispatch(resetAction);
-  };
+  //   const resetAction = StackActions.reset({
+  //     index: 0,
+  //     actions: [NavigationActions.navigate({ routeName: "loginStack" })],
+  //   });
+  //   return this.props.navigation.dispatch(resetAction);
+  // };
   refreshData = async () => {
     const { envUrl } = this.state;
     this.setState({

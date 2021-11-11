@@ -1,4 +1,4 @@
-import React, { Component, Dimensions } from 'react';
+import React, {Component, Dimensions} from 'react';
 import {
   TouchableOpacity,
   View,
@@ -11,12 +11,12 @@ import {
   Alert,
 } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import CheckBox from 'react-native-modest-checkbox';
-import { Images } from '../Themes';
+import {Images} from '../Themes';
 import Drawer from '././Drawer';
 import Utils from '../Utils/Utils';
-import { Base64 } from 'js-base64';
+import {Base64} from 'js-base64';
 import DBPCStaticDataHelper from '../DB/DBPCStaticDataHelper';
 import Config from 'react-native-config';
 import apisauce from 'apisauce';
@@ -39,9 +39,13 @@ class Login extends Component {
     //apisauce = newApi;
 
     this.state = {
-      // username: "RVTechnologies.User1",
-      // password: "D3v3l0PmenT1",
-      // environment: "PDEV2",
+      username: "RVTechnologies.User1",
+      password: "D3v3l0PmenT1",
+      environment: "PDEV1",
+
+      // username: "PROC_EMP",
+      // password: "Skanska123",
+      // environment: "PDEV1",
 
       // username: "PROC_EMP",
       // password: "Skanska123",
@@ -49,31 +53,31 @@ class Login extends Component {
 
       // username: 'Products.User',
       // password: 'Welcome41',
-      // environment: 'PDEV2',
+      // environment: 'PDEV1',
 
-      username: "",
-      password: "",
-      environment: "",
+      // username: "",
+      // password: "",
+      // environment: "",
 
       envURL: '',
       isLoading: false,
       isChecked: false,
     };
 
-    this.checkRememberMe();
+    // this.checkRememberMe();
   }
 
-  componentDidMount() {
-    this.checkTimeOut();
-  }
+  // componentDidMount() {
+  //   this.checkTimeOut();
+  // }
 
   async getEnvironment() {
     if (!this.state.environment) {
-      Alert.alert('', 'Please enter an environment.', [{ text: 'OK' }], {
+      Alert.alert('', 'Please enter an environment.', [{text: 'OK'}], {
         cancelable: false,
       });
     } else {
-      this.setState({ isLoading: false });
+      this.setState({isLoading: false});
       const envparam = [this.state.environment];
       module.exports = envparam;
 
@@ -150,8 +154,7 @@ class Login extends Component {
           'https://skap1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
         console.log('New ENV URL ', envURL);
         this.api = new API.create(envURL);
-      }
-      else if (environment == 'GTDEV1') {
+      } else if (environment == 'GTDEV1') {
         envURL =
           'https://gtdev1a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
         console.log('New ENV URL ', envURL);
@@ -210,7 +213,7 @@ class Login extends Component {
     this.getReplaceReason().then(() => {
       this.getStaticData().then(() => {
         this.getUsageType().then(() => {
-          this.setState({ isLoading: false });
+          this.setState({isLoading: false});
           setTimeout(() => {
             this.props.navigation.navigate('Drawer');
           }, 100);
@@ -227,19 +230,19 @@ class Login extends Component {
     }
 
     if (!this.state.username) {
-      return Alert.alert('', 'Please enter a username.', [{ text: 'OK' }], {
+      return Alert.alert('', 'Please enter a username.', [{text: 'OK'}], {
         cancelable: false,
       });
     } else if (!this.state.password) {
-      return Alert.alert('', 'Please enter a password.', [{ text: 'OK' }], {
+      return Alert.alert('', 'Please enter a password.', [{text: 'OK'}], {
         cancelable: false,
       });
     } else {
-      this.setState({ isLoading: true });
+      this.setState({isLoading: true});
       const params = [this.state.username, this.state.password];
 
       this.api['getLogin'].apply(this, params).then(result => {
-        this.setState({ isLoading: false });
+        this.setState({isLoading: false});
         console.log('Response API ok: >>>>', result);
 
         if (result.ok) {
@@ -260,7 +263,7 @@ class Login extends Component {
               //  this.getReplaceReason().then(() => {
               //this.getStaticData().then(() => {
               //   this.getUsageType().then(() => {
-              this.setState({ isLoading: false });
+              this.setState({isLoading: false});
               setTimeout(() => {
                 this.props.navigation.navigate('Drawer');
               }, 100);
@@ -282,13 +285,13 @@ class Login extends Component {
               Alert.alert(
                 '',
                 'Invalid username and password.',
-                [{ text: 'OK' }],
-                { cancelable: false },
+                [{text: 'OK'}],
+                {cancelable: false},
               );
             }, 100);
           }
         } else {
-          this.setState({ isLoading: false });
+          this.setState({isLoading: false});
           setTimeout(() => {
             console.log(
               'Response API: failed',
@@ -298,8 +301,8 @@ class Login extends Component {
               'Oops',
               'Please check the enviroment and login details.',
               // "There seems to be a problem with then connection. Please try again later.",
-              [{ text: 'OK' }],
-              { cancelable: false },
+              [{text: 'OK'}],
+              {cancelable: false},
             );
           }, 100);
         }
@@ -396,7 +399,7 @@ class Login extends Component {
                   style={styles.input}
                   placeholder="Enter the environment"
                   value={this.state.environment}
-                  onChangeText={text => this.setState({ environment: text })}
+                  onChangeText={text => this.setState({environment: text})}
                 />
               </View>
 
@@ -408,7 +411,7 @@ class Login extends Component {
                   style={styles.input}
                   placeholder="Enter your username"
                   value={this.state.username}
-                  onChangeText={text => this.setState({ username: text })}
+                  onChangeText={text => this.setState({username: text})}
                 />
               </View>
 
@@ -421,11 +424,11 @@ class Login extends Component {
                   placeholder="Enter your password"
                   secureTextEntry={true}
                   value={this.state.password}
-                  onChangeText={text => this.setState({ password: text })}
+                  onChangeText={text => this.setState({password: text})}
                 />
               </View>
 
-              <View style={styles.checkboxView}>
+              {/* <View style={styles.checkboxView}>
                 <CheckBox
                   checkboxStyle={styles.checkbox}
                   onChange={checked =>
@@ -436,7 +439,7 @@ class Login extends Component {
                   checked={this.state.isChecked}
                   label="Remember Me"
                 />
-              </View>
+              </View> */}
 
               <TouchableOpacity
                 onPress={() => {

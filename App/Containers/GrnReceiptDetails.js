@@ -508,6 +508,7 @@ class GrnReceiptDetails extends Component {
   }
 
   render() {
+    const {entityPurchaseOrder}=this.state;
     // || this.state.entityPurchaseOrder.submitStatus == "pending"
     if (this.state.entityPurchaseOrder.submitStatus == 'processing') {
       return (
@@ -663,7 +664,7 @@ class GrnReceiptDetails extends Component {
                   </View>
                   <View style={styles.pinkInfoContainer}>
                     <Text style={styles.infoTextLeft}>Item No.</Text>
-                    <Text style={styles.infoText}>0000</Text>
+                    <Text style={styles.infoText}>{entityPurchaseOrder.item_number}</Text>
                   </View>
                   <View style={styles.greyInfoContainer}>
                     <Text style={styles.infoTextLeft}>Description</Text>

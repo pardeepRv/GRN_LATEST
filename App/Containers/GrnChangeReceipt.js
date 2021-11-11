@@ -630,17 +630,36 @@ class GrnChangeReceipt extends Component {
               <View style={styles.headerContainer}>
                 <View style={styles.lineWithBottomSpace} />
                 <View style={styles.greyInfoContainer}>
-                  <Text style={styles.infoTextLeft}>Item No</Text>
+                  <Text style={styles.infoTextLeft}>Order No.</Text>
                   <Text style={styles.infoText}>
                     {this.state.entityReceipt.order_number}
                   </Text>
                 </View>
-                <View style={styles.pinkInfoContainer}>
+                {/* <View style={styles.pinkInfoContainer}>
                   <Text style={styles.infoTextLeft}>Description</Text>
                   <Text style={styles.infoText}>
                     {this.state.entityReceipt.item_description}
                   </Text>
-                </View>
+                </View> */}
+                <View
+                    style={{
+                      padding: 10,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      backgroundColor: '#FCE8E7',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={[styles.infoTextLeft, {paddingLeft: 10}]}>
+                      Description
+                    </Text>
+                    <Text
+                      style={[
+                        styles.infoText,
+                        {width: 110, alignSelf: 'center'},
+                      ]}>
+                      {this.state.entityReceipt.item_description}
+                    </Text>
+                  </View>
                 <View style={styles.greyInfoContainer}>
                   <Text style={styles.infoTextLeft}>UOM</Text>
                   <Text style={styles.infoText}>

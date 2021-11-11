@@ -1,6 +1,6 @@
 // import { StackNavigator } from 'react-navigation'
 import {createStackNavigator} from 'react-navigation-stack';
-import {createAppContainer} from 'react-navigation';
+import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 
 import GrnSearchResult from '../Containers/GrnSearchResult';
 import GrnSearch from '../Containers/GrnSearch';
@@ -39,6 +39,7 @@ import RequisitionList from '../Containers/RequisitionList';
 import LaunchScreen from '../Containers/LaunchScreen';
 
 import styles from './Styles/NavigationStyles';
+import AuthLoadingScreen from './AuthLoadingScreen';
 
 // Manifest of possible screens
 const PrimaryNav = createStackNavigator(
@@ -94,14 +95,79 @@ const PrimaryNav = createStackNavigator(
     defaultNavigationOptions: {
       headerShown: false,
       gestureEnabled: false,
-      headerBackTitleVisible:false,
-      headerBackTitle:'hjvcwvyu'
+      headerBackTitleVisible: false,
+      headerBackTitle: 'hjvcwvyu',
     },
     initialRouteName: 'Login',
     headerMode: 'none',
   },
 );
 
-export default createAppContainer(PrimaryNav);
+// export default createAppContainer(PrimaryNav);
 
 // export default PrimaryNav
+
+const AppStack = createStackNavigator(
+  {
+    Drawer: {screen: GrnTab},
+    GrnSearchResult: {screen: GrnSearchResult},
+    GrnSearch: {screen: GrnSearch},
+    GrnSettingsStack: {screen: GrnSettingsStack},
+    GrnReceiptsStack: {screen: GrnReceiptsStack},
+    GrnPurchaseOrderStack: {screen: GrnPurchaseOrderStack},
+    //GrnHomeStack: { screen: GrnHomeStack },
+    PcSettingsStack: {screen: PcSettingsStack},
+    PcRequisitionsStack: {screen: PcRequisitionsStack},
+    PcHomeStack: {screen: PcHomeStack},
+    GrnTab: {screen: GrnTab},
+    PcTab: {screen: PcTab},
+    GrnCameraRoll: {screen: GrnCameraRoll},
+    GrnPurchaseOrderDetails: {screen: GrnPurchaseOrderDetails},
+    GrnReceiptDetails: {screen: GrnReceiptDetails},
+    GrnChangeReceipt: {screen: GrnChangeReceipt},
+    GrnRejectReceipt: {screen: GrnRejectReceipt},
+    GrnEditReceipt: {screen: GrnEditReceipt},
+    PcCreateChangeOrder: {screen: PcCreateChangeOrder},
+    PcAddOrderLine: {screen: PcAddOrderLine},
+    PcViewRequisition: {screen: PcViewRequisition},
+    PcRequisitionsSummary: {screen: PcRequisitionsSummary},
+    PcSelectArea: {screen: PcSelectArea},
+    PcEditAttribute: {screen: PcEditAttribute},
+    PcCreateRequisition: {screen: PcCreateRequisition},
+    PcSettings: {screen: PcSettings},
+    PcRequisitions: {screen: PcRequisitions},
+    PcHome: {screen: PcHome},
+    GrnSettings: {screen: GrnSettings},
+    GrnReceipts: {screen: GrnReceipts},
+    GrnPurchaseOrder: {screen: GrnPurchaseOrder},
+    GrnHome: {screen: GrnHome},
+    // Login: {screen: Login},
+    RequisitionList: {screen: RequisitionList},
+    LaunchScreen: {screen: LaunchScreen},
+  },
+  {
+    defaultNavigationOptions: {
+      headerShown: false,
+      gestureEnabled: false,
+      headerBackTitleVisible: false,
+      headerBackTitle: 'hjvcwvyu',
+    },
+    // initialRouteName: 'Drawer',
+    headerMode: 'none',
+  },
+);
+
+const AuthStack = createStackNavigator({Login: Login});
+
+export default createAppContainer(
+  createSwitchNavigator(
+    {
+      AuthLoading: AuthLoadingScreen,
+      Auth: AuthStack,
+      App: AppStack,
+    },
+    {
+      initialRouteName: 'AuthLoading',
+    },
+  ),
+);
