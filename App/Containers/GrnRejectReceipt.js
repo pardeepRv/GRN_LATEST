@@ -348,6 +348,8 @@ class GrnRejectReceipt extends Component {
     this.setState({isLoading: false});
 
     setTimeout(async () => {
+      console.log('Response API ok: 322dwd', response);
+
       if (response.ok) {
         console.log('Response API ok: 322', response.data);
 

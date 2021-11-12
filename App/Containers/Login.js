@@ -39,9 +39,9 @@ class Login extends Component {
     //apisauce = newApi;
 
     this.state = {
-      username: "RVTechnologies.User1",
-      password: "D3v3l0PmenT1",
-      environment: "PDEV1",
+      // username: "RVTechnologies.User1",
+      // password: "D3v3l0PmenT1",
+      // environment: "PDEV1",
 
       // username: "PROC_EMP",
       // password: "Skanska123",
@@ -55,9 +55,9 @@ class Login extends Component {
       // password: 'Welcome41',
       // environment: 'PDEV1',
 
-      // username: "",
-      // password: "",
-      // environment: "",
+      username: "",
+      password: "",
+      environment: "",
 
       envURL: '',
       isLoading: false,

@@ -183,7 +183,10 @@ class GrnReceiptDetails extends Component {
       this.sendFile();
     } else {
       let receipt = this.state.entityPurchaseOrder;
+      console.log('receipt organization>>>>>>>>>>>>>>1', receipt);
+
       console.log('receipt organization', receipt.to_organization);
+
       this.postCreateReceipt(
         receipt.order_number,
         receipt.order_line_number,
@@ -260,6 +263,7 @@ class GrnReceiptDetails extends Component {
     file_id,
     distribution_number,
   ) {
+     
     this.setState({isLoading: true});
 
     var receipt = new CreateReceipt(
@@ -480,17 +484,19 @@ class GrnReceiptDetails extends Component {
         // console.log("updated Receipt data: ", updatedReceipt)
         let updatedReceipt = this.state.entityPurchaseOrder;
 
+        console.log("updated Receipt data:>>>>>>>>>>>1111 ", updatedReceipt)
+
         //call change receipt API
         this.postCreateReceipt(
           updatedReceipt.order_number,
           updatedReceipt.order_line_number,
-          updatedReceipt.quantity,
+          parseFloat(this.state.quantity),
           updatedReceipt.unit_of_measure,
           updatedReceipt.to_organization_id,
           updatedReceipt.to_organization,
-          updatedReceipt.comments,
+          this.state.comments,
           updatedReceipt.type,
-          updatedReceipt.file_id,
+          this.file_id,
           updatedReceipt.distribution_number,
         );
       } else {
@@ -508,7 +514,7 @@ class GrnReceiptDetails extends Component {
   }
 
   render() {
-    const {entityPurchaseOrder}=this.state;
+    const {entityPurchaseOrder} = this.state;
     // || this.state.entityPurchaseOrder.submitStatus == "pending"
     if (this.state.entityPurchaseOrder.submitStatus == 'processing') {
       return (
@@ -664,7 +670,9 @@ class GrnReceiptDetails extends Component {
                   </View>
                   <View style={styles.pinkInfoContainer}>
                     <Text style={styles.infoTextLeft}>Item No.</Text>
-                    <Text style={styles.infoText}>{entityPurchaseOrder.item_number}</Text>
+                    <Text style={styles.infoText}>
+                      {entityPurchaseOrder.item_number}
+                    </Text>
                   </View>
                   <View style={styles.greyInfoContainer}>
                     <Text style={styles.infoTextLeft}>Description</Text>

@@ -276,7 +276,22 @@ class GrnChangeReceipt extends Component {
     file_id,
     receipt_id,
   ) {
-    this.setState({isLoading: true});
+
+      console.log( order_number,
+      order_line_number,
+      quantity,
+      unit_of_measure,
+      item_number,
+      item_description,
+      to_organization,
+      comments,
+      receipt_num,
+      deliver_tran_id,
+      receive_tran_id,
+      type,
+      file_id,
+      receipt_id,'cwcwcwcwcwcewcwcw>>>>>>>>>>>>>>>>>>>>>');
+     this.setState({isLoading: true});
 
     const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
     const response = await this.api.postCorrectReceipt(
@@ -294,11 +309,14 @@ class GrnChangeReceipt extends Component {
       receive_tran_id,
       type,
       file_id,
+      receipt_id
     );
 
     this.setState({isLoading: false});
 
     setTimeout(async () => {
+      console.log('Response API ok: 267wdwd', response);
+
       if (response.ok) {
         console.log('Response API ok: 267', response.data);
 
@@ -491,19 +509,38 @@ class GrnChangeReceipt extends Component {
         console.log('ImagePicker Error: ', res.error);
       } else if (res.customButton) {
         console.log('User tapped ');
-      } else {
-        let source = {uri: res.uri};
+      } 
+      // else {
+      //   let source = {uri: res.uri};
+      //   this.setState({
+      //     img: source,
+      //   });
+      //   this.photoURI = source.uri;
+      //   this.data = new FormData();
+      //   this.data.append('photo', {
+      //     uri: res.uri,
+      //     type: 'image/jpeg', // or photo.type
+      //     name: 'testPhotoName',
+      //   });
+      // }
+
+      else {
+        let source = {
+          uri: res && res.assets && res.assets.length > 0 && res.assets[0].uri,
+        };
         this.setState({
           img: source,
         });
-        this.photoURI = source.uri;
+        this.photoURI =
+          res && res.assets && res.assets.length > 0 && res.assets[0].uri;
         this.data = new FormData();
         this.data.append('photo', {
-          uri: res.uri,
+          uri: res && res.assets && res.assets.length > 0 && res.assets[0].uri,
           type: 'image/jpeg', // or photo.type
           name: 'testPhotoName',
         });
       }
+
     });
     return;
     // const options = {

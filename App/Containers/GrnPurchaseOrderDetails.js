@@ -196,7 +196,8 @@ class GrnPurchaseOrderDetails extends Component {
     };
     this.setState({
       dataObjects: updatedData,
-      createReceiptObjects: this.state.dataObjects,
+      // createReceiptObjects: this.state.dataObjects,
+      createReceiptObjects: updatedData,
     });
   }
 
@@ -204,9 +205,12 @@ class GrnPurchaseOrderDetails extends Component {
     console.log(submitStatus, index, 'submitStatus, index');
     let updatedData = [...this.state.dataObjects];
     updatedData[index] = {...updatedData[index], submitStatus: submitStatus};
+    console.log(updatedData, 'on refresh updatedData');
+
     this.setState({
       dataObjects: updatedData,
-      createReceiptObjects: this.state.dataObjects,
+      // createReceiptObjects: this.state.dataObjects,
+      createReceiptObjects: updatedData,
     });
   }
 
@@ -255,17 +259,41 @@ class GrnPurchaseOrderDetails extends Component {
   };
 
   _submitReceiptAlert = () => {
+    console.log(
+      this.state.createReceiptObjects,
+      'this.state.createReceiptObjects on click submit>>>>>>>>.',
+    );
+
     if (this.state.createReceiptObjects.length > 0) {
-      Alert.alert(
-        'Submit Receipts?',
-        'Are you sure you want to submit the receipts for all the selected purchase order lines?',
-        [
-          {text: 'Cancel', style: ''},
-          // {text: 'OK', onPress: this.submitReceipt.bind(this)},
-          {text: 'OK', onPress: this.submitSelectedReceiptOnly.bind(this)},
-        ],
-        {cancelable: false},
-      );
+      for (
+        let index = 0;
+        index < this.state.createReceiptObjects.length;
+        index++
+      ) {
+        const element = this.state.createReceiptObjects[index];
+
+        if (element && element.edited) {
+          return Alert.alert(
+            'Submit Receipts?',
+            'Are you sure you want to submit the receipts for all the selected purchase order lines?',
+            [
+              {text: 'Cancel', style: ''},
+              // {text: 'OK', onPress: this.submitReceipt.bind(this)},
+              {text: 'OK', onPress: this.submitSelectedReceiptOnly.bind(this)},
+            ],
+            {cancelable: false},
+          );
+        }
+
+        if (element && element.submitStatus == 'processing') {
+          return Alert.alert(
+            '',
+            'Please create at least one receipt to submit.',
+            [{text: 'OK'}],
+            {cancelable: false},
+          );
+        }
+      }
     } else {
       Alert.alert(
         '',
@@ -278,7 +306,7 @@ class GrnPurchaseOrderDetails extends Component {
 
   // for selected receipts only>>>>>>>>>>.
   submitSelectedReceiptOnly = () => {
-    debugger
+    debugger;
     // this.setState({isLoading: true});
 
     this.getCreateReceipts();
@@ -379,12 +407,13 @@ class GrnPurchaseOrderDetails extends Component {
 
     for (let i = 0; i < this.state.createReceiptObjects.length; i++) {
       if (this.state.createReceiptObjects[i].edited) {
-        this.state.createReceiptObjects[i].quantity=this.state.createReceiptObjects[i].quantity_received;
+        this.state.createReceiptObjects[i].quantity =
+          this.state.createReceiptObjects[i].quantity_received;
         updatedArr.push(this.state.createReceiptObjects[i]);
       }
     }
 
-      console.log('updated Receipts To Post updatedArr', updatedArr);
+    console.log('updated Receipts To Post updatedArr', updatedArr);
 
     const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
     const response = await CreateReceiptsAPIHelper.postCreateReceipt(
@@ -400,7 +429,7 @@ class GrnPurchaseOrderDetails extends Component {
         console.log('Print Receipts', updatedArr);
         console.log('Response API ok: ', response.data);
         // this.submitSuccessfulAlert();
-        alert('Receipts successfully submitted.')
+        alert('Receipts successfully submitted.');
       } else {
         console.log(
           'Response API: failed',
@@ -724,8 +753,8 @@ class GrnPurchaseOrderDetails extends Component {
                     {item.distribution_number}
                   </Text>
                 </View>
-                <View style={styles.rowSection5}>
-                  <Text style={styles.rowLabel}>{item.delivery_date}</Text>
+                <View style={[styles.rowSection5, {padding: 5}]}>
+                  <Text style={[{fontSize: 8}]}>{item.delivery_date}</Text>
                 </View>
                 <View style={styles.rowSection6}>
                   <Image
@@ -867,8 +896,8 @@ class GrnPurchaseOrderDetails extends Component {
                     {item.distribution_number}
                   </Text>
                 </View>
-                <View style={styles.rowSection5}>
-                  <Text style={styles.rowLabel}>{item.delivery_date}</Text>
+                <View style={[styles.rowSection5, {padding: 5}]}>
+                  <Text style={[{fontSize: 8}]}>{item.delivery_date}</Text>
                 </View>
                 <View style={styles.rowSection6}>
                   <Image
@@ -977,7 +1006,9 @@ class GrnPurchaseOrderDetails extends Component {
                       <Text style={styles.headerLabel}>Dist No.</Text>
                     </View>
                     <View style={styles.headerSection5}>
-                      <Text style={styles.headerLabel}>Delivery Date</Text>
+                      <Text style={styles.headerLabel}>
+                        Requested Delivery Date
+                      </Text>
                     </View>
                   </View>
                   <View style={styles.line} />

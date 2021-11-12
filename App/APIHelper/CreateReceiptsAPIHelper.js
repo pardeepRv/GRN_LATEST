@@ -29,7 +29,7 @@ let CreateReceiptsAPIHelper = {
       params.push(param);
     });
 
-    console.log("Params sending to api: ", params);
+     console.log("Params sending to api: ", params);
 
     const api = API.create(enVar);
     const response = await api.postCreateReceipt(username, params);
