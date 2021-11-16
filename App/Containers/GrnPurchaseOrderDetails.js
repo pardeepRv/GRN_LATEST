@@ -50,6 +50,7 @@ class GrnPurchaseOrderDetails extends Component {
       entireReceipts: [],
       totalCount: 0,
       envUrl: '',
+      pressEntireRecipts: false,
     };
 
     this.api = API.create();
@@ -227,6 +228,9 @@ class GrnPurchaseOrderDetails extends Component {
   };
 
   submitAllCreateReceipts = async () => {
+    this.setState({
+      pressEntireRecipts: true,
+    });
     await this.getCreateReceipts();
     await this.saveCreateAllReceipt();
     await this.submitReceipt();
@@ -375,15 +379,21 @@ class GrnPurchaseOrderDetails extends Component {
 
           // API.create(this.state.envUrl);
           //send file API : upload image
-          this.uploadImage(entity.id);
+          // this.uploadImage(entity.id,entity);
+          this.uploadImagesEntire();
         } else {
-          this.state.currentNoOfReceiptsToPost++;
-          this.counterToCallCreateReceiptsAPI(
-            this.state.currentNoOfReceiptsToPost,
-            this.state.createReceiptObjects.length,
-          );
+          // this.state.currentNoOfReceiptsToPost++;
+          // this.counterToCallCreateReceiptsAPI(
+          //   this.state.currentNoOfReceiptsToPost,
+          //   this.state.createReceiptObjects.length,
+          // );
         }
       }
+      this.state.currentNoOfReceiptsToPost++;
+      this.counterToCallCreateReceiptsAPI(
+        this.state.currentNoOfReceiptsToPost,
+        this.state.createReceiptObjects.length,
+      );
     } else {
       console.log('No Create Receipt in DB');
     }
@@ -451,11 +461,12 @@ class GrnPurchaseOrderDetails extends Component {
 
     for (let i = 0; i < this.state.createReceiptObjects.length; i++) {
       if (
-        this.state.createReceiptObjects[i].quantity &&
-        this.state.createReceiptObjects[i].quantity != null
+        // this.state.createReceiptObjects[i].quantity &&
+        // this.state.createReceiptObjects[i].quantity != null &&
+        this.state.createReceiptObjects[i].quantity_received
       ) {
         this.state.createReceiptObjects[i].quantity =
-          this.state.createReceiptObjects[i].quantity;
+          this.state.createReceiptObjects[i].quantity_received;
       } else {
         this.state.createReceiptObjects[i].quantity =
           this.state.createReceiptObjects[i].quantity_available_to_receive;
@@ -490,6 +501,9 @@ class GrnPurchaseOrderDetails extends Component {
         console.log('Print Receipts', this.state.createReceiptObjects);
         console.log('Response API ok: ', response.data);
         this.submitSuccessfulAlert();
+        this.setState({
+          pressEntireRecipts: false,
+        });
       } else {
         console.log(
           'Response API: failed',
@@ -505,7 +519,16 @@ class GrnPurchaseOrderDetails extends Component {
     totalReceiptsToPost,
   ) {
     debugger;
-    if (currentNoOfReceiptsToPost == totalReceiptsToPost) {
+    console.log(
+      'currentNoOfReceiptsToPost totalReceiptsToPost',
+      currentNoOfReceiptsToPost,
+      totalReceiptsToPost,
+    );
+
+    // if (currentNoOfReceiptsToPost == totalReceiptsToPost) {
+    //   this.postCreateReceipt();
+    // }
+    if (this.state.pressEntireRecipts) {
       this.postCreateReceipt();
     } else {
       this.postCreateSelectedReceipt();
@@ -533,6 +556,41 @@ class GrnPurchaseOrderDetails extends Component {
         //update file id to local
         // await this.updateCreateReceiptFile(entityID, this.file_id);
 
+        this.state.currentNoOfReceiptsToPost++;
+        this.counterToCallCreateReceiptsAPI(
+          this.state.currentNoOfReceiptsToPost,
+          this.state.createReceiptObjects.length,
+        );
+      } else {
+        console.log(
+          'Response API: failed',
+          result.status + ' - ' + result.problem,
+        );
+      }
+    }, 100);
+  }
+
+  async uploadImagesEntire() {
+    console.log(this.state.createReceiptObjects, '............id and index');
+
+    this.setState({isLoading: true});
+    console.log('Image data', this.data);
+    const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
+    this.api = API.create(this.state.envUrl);
+
+    const params = [username, 'testPhotoName', this.data];
+    let result = await this.api['postPhoto'].apply(this, params);
+
+    this.setState({isLoading: false});
+    setTimeout(async () => {
+      console.log('result of pic api ', result);
+
+      if (result.ok) {
+        console.log('Response API ok: ', result.data);
+        this.file_id = result.data.REQUEST_ID;
+        console.log('API Response:', this.data, this.photoURL);
+
+        return;
         this.state.currentNoOfReceiptsToPost++;
         this.counterToCallCreateReceiptsAPI(
           this.state.currentNoOfReceiptsToPost,
