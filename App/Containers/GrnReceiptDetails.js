@@ -173,7 +173,7 @@ class GrnReceiptDetails extends Component {
   _submit = () => {
     //save to local
     // this.saveCreateReceipt(this.state.comments, this.photoURI, this.state.quantity)
-
+    console.log(this.photoURI, 'this.photoURI');
     if (
       this.photoURI != '' &&
       this.photoURI != undefined &&
@@ -263,7 +263,6 @@ class GrnReceiptDetails extends Component {
     file_id,
     distribution_number,
   ) {
-     
     this.setState({isLoading: true});
 
     var receipt = new CreateReceipt(
@@ -345,6 +344,7 @@ class GrnReceiptDetails extends Component {
           this.photoURI,
           this.state.quantity,
           this.state.index,
+          this.file_id
         );
         this.props.navigation.pop();
       }
@@ -484,7 +484,7 @@ class GrnReceiptDetails extends Component {
         // console.log("updated Receipt data: ", updatedReceipt)
         let updatedReceipt = this.state.entityPurchaseOrder;
 
-        console.log("updated Receipt data:>>>>>>>>>>>1111 ", updatedReceipt)
+        console.log('updated Receipt data:>>>>>>>>>>>1111 ', updatedReceipt);
 
         //call change receipt API
         this.postCreateReceipt(
@@ -674,9 +674,9 @@ class GrnReceiptDetails extends Component {
                       {entityPurchaseOrder.item_number}
                     </Text>
                   </View>
-                  <View style={styles.greyInfoContainer}>
+                  <View style={[styles.greyInfoContainer]}>
                     <Text style={styles.infoTextLeft}>Description</Text>
-                    <Text style={styles.infoText}>
+                    <Text style={[styles.infoText, {width: 200}]}>
                       {this.state.entityPurchaseOrder.item_description}
                     </Text>
                   </View>

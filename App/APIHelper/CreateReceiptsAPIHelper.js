@@ -6,9 +6,10 @@ let CreateReceiptsAPIHelper = {
   async postCreateReceipt(username, receipts, enVar) {
     console.log('Post Create Receipt Params', receipts);
 
-    var params = [];
-    receipts.map(receipt => {
-      var param = {};
+    let params = [];
+    receipts.forEach(receipt => {
+      console.log(receipt, 'consoling here the receipits one by one');
+      let param = {};
       param['order_number'] = receipt.order_number;
       param['order_line_number'] = receipt.order_line_number;
       param['quantity'] = receipt.quantity;
@@ -22,14 +23,14 @@ let CreateReceiptsAPIHelper = {
         param['comments'] = receipt.comments;
       }
       param['type'] = receipt.type;
+      console.log(receipt.file_id, 'receipt.file_id');
       if (receipt.file_id) {
         param['file_id'] = receipt.file_id;
       }
-
       params.push(param);
     });
 
-     console.log('Params sending to api: ', params);
+    console.log('Params sending to api: ', params);
 
     const api = API.create(enVar);
     const response = await api.postCreateReceipt(username, params);

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
+       <domain includeSubdomains="true">inoapps.com</domain>
+        <domain includeSubdomains="true">https://pdev1a1-inoapps4.inoapps.com/ords/inoapps_ec/</domain>
         <domain includeSubdomains="true">10.0.2.2</domain>
+         <trust-anchors>
+            <certificates src="@raw/sfig"/>
+        </trust-anchors>
     </domain-config>
 </network-security-config>

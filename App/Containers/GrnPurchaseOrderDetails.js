@@ -1,32 +1,27 @@
 import React, {Component} from 'react';
 import {
+  Alert,
+  FlatList,
+  Image,
   ScrollView,
   Text,
-  View,
-  KeyboardAvoidingView,
-  Image,
-  FlatList,
   TouchableHighlight,
   TouchableOpacity,
-  Alert,
+  View,
 } from 'react-native';
+import Spinner from 'react-native-loading-spinner-overlay';
 import CheckBox from 'react-native-modest-checkbox';
 import {connect} from 'react-redux';
-import {Images} from '../Themes';
-import GrnReceiptDetails from '././GrnReceiptDetails';
-import Utils from '../Utils/Utils';
-import DBGrnPurchaseOrderDataHelper from '../DB/DBGrnPurchaseOrderDataHelper';
-import Spinner from 'react-native-loading-spinner-overlay';
-import CreateReceipt from '../Models/CreateReceipt';
-import CreateReceiptsAPIHelper from '../APIHelper/CreateReceiptsAPIHelper';
 import API from '../../App/Services/Api';
-
+import CreateReceiptsAPIHelper from '../APIHelper/CreateReceiptsAPIHelper';
+import EnvironmentVar from '../Config/EnvironmentVar';
+import DBGrnPurchaseOrderDataHelper from '../DB/DBGrnPurchaseOrderDataHelper';
+import {Images} from '../Themes';
+import Utils from '../Utils/Utils';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
-
 // Styles
 import styles from './Styles/GrnPurchaseOrderDetailsStyle';
-import EnvironmentVar from '../Config/EnvironmentVar';
 
 class GrnPurchaseOrderDetails extends Component {
   api = {};
@@ -53,6 +48,7 @@ class GrnPurchaseOrderDetails extends Component {
       pressEntireRecipts: false,
     };
 
+    this.file_idArr = [];
     this.api = API.create();
     console.log(this.state.entityPurchaseOrder, 'entityPurchaseOrder>>>');
     console.log(
@@ -178,14 +174,16 @@ class GrnPurchaseOrderDetails extends Component {
     });
   }
 
-  returnData(edited, comments, photoURL, quantity, index) {
+  async returnData(edited, comments, photoURL, quantity, index, file_id) {
     console.log(
       edited,
       comments,
       photoURL,
       quantity,
       index,
+      file_id,
       'edited, comments, photoURL, quantity, index',
+      'file_id',
     );
     let updatedData = [...this.state.dataObjects];
     updatedData[index] = {
@@ -195,6 +193,24 @@ class GrnPurchaseOrderDetails extends Component {
       photoURL: photoURL,
       quantity_received: parseInt(quantity),
     };
+
+    const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
+    this.api = API.create(this.state.envUrl);
+
+    const params = [username, 'testPhotoName', this.data];
+    let result = await this.api['postPhoto'].apply(this, params);
+
+    console.log('result of pic api in sending to frst screen ', result);
+
+    if (result.ok) {
+      console.log('Response API ok: ', result.data);
+      updatedData.forEach((element, idx) => {
+        if (element.edited && idx == index) {
+          updatedData[idx].file_id = result.data.REQUEST_ID;
+        }
+      });
+    }
+    console.log(updatedData, 'updatedDataupdatedData<><>');
     this.setState({
       dataObjects: updatedData,
       // createReceiptObjects: this.state.dataObjects,
@@ -339,16 +355,24 @@ class GrnPurchaseOrderDetails extends Component {
 
             // API.create(this.state.envUrl);
             //send file API : upload image
-            this.uploadImage(entity.id);
+
+            //commenting code bcoz we are using it prior
+
+            // this.uploadImage(entity.id, i);
           } else {
-            this.state.currentNoOfReceiptsToPost++;
-            this.counterToCallCreateReceiptsAPI(
-              this.state.currentNoOfReceiptsToPost,
-              this.state.createReceiptObjects.length,
-            );
+            // this.state.currentNoOfReceiptsToPost++;
+            // this.counterToCallCreateReceiptsAPI(
+            //   this.state.currentNoOfReceiptsToPost,
+            //   this.state.createReceiptObjects.length,
+            // );
           }
         }
       }
+      this.state.currentNoOfReceiptsToPost++;
+      this.counterToCallCreateReceiptsAPI(
+        this.state.currentNoOfReceiptsToPost,
+        this.state.createReceiptObjects.length,
+      );
     } else {
       console.log('No Create Receipt in DB');
     }
@@ -411,6 +435,7 @@ class GrnPurchaseOrderDetails extends Component {
       'Selected items Api hit',
       this.state.createReceiptObjects.length,
     );
+
     this.setState({isLoading: false});
 
     let updatedArr = [];
@@ -426,6 +451,7 @@ class GrnPurchaseOrderDetails extends Component {
     console.log('updated Receipts To Post updatedArr', updatedArr);
 
     const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
+
     const response = await CreateReceiptsAPIHelper.postCreateReceipt(
       username,
       updatedArr,
@@ -438,8 +464,8 @@ class GrnPurchaseOrderDetails extends Component {
       if (response.ok) {
         console.log('Print Receipts', updatedArr);
         console.log('Response API ok: ', response.data);
-        // this.submitSuccessfulAlert();
-        alert('Receipts successfully submitted.');
+        this.submitSuccessfulAlert();
+        // alert('Receipts successfully submitted.');
       } else {
         console.log(
           'Response API: failed',
@@ -535,7 +561,7 @@ class GrnPurchaseOrderDetails extends Component {
     }
   }
 
-  async uploadImage(entityID) {
+  async uploadImage(entityID, idx) {
     this.setState({isLoading: true});
     console.log('Image data', this.data);
     const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
@@ -551,11 +577,27 @@ class GrnPurchaseOrderDetails extends Component {
       if (result.ok) {
         console.log('Response API ok: ', result.data);
         this.file_id = result.data.REQUEST_ID;
+        console.log(this.file_id, 'this.file_id in me>>>');
         console.log('API Response:', entityID, this.data, this.photoURL);
 
         //update file id to local
         // await this.updateCreateReceiptFile(entityID, this.file_id);
 
+        // for (let i = 0; i < this.state.createReceiptObjects.length; i++) {
+        //   if (this.state.createReceiptObjects[i].edited && i == idx) {
+        //     this.state.createReceiptObjects[i].file_id_new =
+        //       result.data.REQUEST_ID;
+        //   }
+        // }
+
+        // this.state.createReceiptObjects.forEach((element, index) => {
+        //   if (element.edited && index == idx) {
+        //     this.state.createReceiptObjects[index].file_id_new =
+        //       result.data.REQUEST_ID;
+        //   }
+        // });
+
+        return;
         this.state.currentNoOfReceiptsToPost++;
         this.counterToCallCreateReceiptsAPI(
           this.state.currentNoOfReceiptsToPost,
@@ -717,8 +759,13 @@ class GrnPurchaseOrderDetails extends Component {
                     {item.distribution_number}
                   </Text>
                 </View>
-                <View style={styles.rowSection5}>
+                {/* <View style={styles.rowSection5}>
                   <Text style={styles.rowLabel}>{item.delivery_date}</Text>
+                </View> */}
+                <View style={[styles.rowSection5, {padding: 5}]}>
+                  <Text style={[{fontSize: 8, fontWeight: 'bold'}]}>
+                    {item.delivery_date}
+                  </Text>
                 </View>
                 <View style={styles.rowSection6}>
                   <Image
@@ -812,7 +859,9 @@ class GrnPurchaseOrderDetails extends Component {
                   </Text>
                 </View>
                 <View style={[styles.rowSection5, {padding: 5}]}>
-                  <Text style={[{fontSize: 8}]}>{item.delivery_date}</Text>
+                  <Text style={[{fontSize: 8, fontWeight: 'bold'}]}>
+                    {item.delivery_date}
+                  </Text>
                 </View>
                 <View style={styles.rowSection6}>
                   <Image
@@ -860,8 +909,13 @@ class GrnPurchaseOrderDetails extends Component {
                     {item.distribution_number}
                   </Text>
                 </View>
-                <View style={styles.rowSection5}>
+                {/* <View style={styles.rowSection5}>
                   <Text style={styles.rowLabel}>{item.delivery_date}</Text>
+                </View> */}
+                <View style={[styles.rowSection5, {padding: 5}]}>
+                  <Text style={[{fontSize: 8, fontWeight: 'bold'}]}>
+                    {item.delivery_date}
+                  </Text>
                 </View>
                 <View style={styles.rowSection6}>
                   <Image
@@ -907,8 +961,13 @@ class GrnPurchaseOrderDetails extends Component {
                     {item.distribution_number}
                   </Text>
                 </View>
-                <View style={styles.rowSection5}>
+                {/* <View style={styles.rowSection5}>
                   <Text style={styles.rowLabel}>{item.delivery_date}</Text>
+                </View> */}
+                <View style={[styles.rowSection5, {padding: 5}]}>
+                  <Text style={[{fontSize: 8, fontWeight: 'bold'}]}>
+                    {item.delivery_date}
+                  </Text>
                 </View>
                 <View style={styles.rowSection6}>
                   <Image
@@ -955,7 +1014,9 @@ class GrnPurchaseOrderDetails extends Component {
                   </Text>
                 </View>
                 <View style={[styles.rowSection5, {padding: 5}]}>
-                  <Text style={[{fontSize: 8}]}>{item.delivery_date}</Text>
+                  <Text style={[{fontSize: 8, fontWeight: 'bold'}]}>
+                    {item.delivery_date}
+                  </Text>
                 </View>
                 <View style={styles.rowSection6}>
                   <Image

@@ -26,6 +26,8 @@ import styles from './Styles/LoginStyle';
 
 // For API
 import API from '../../App/Services/Api';
+const axios = require('axios');
+
 import FJSON from 'format-json';
 // import { AsyncStorage } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -39,25 +41,25 @@ class Login extends Component {
     //apisauce = newApi;
 
     this.state = {
-      // username: "RVTechnologies.User1",
-      // password: "D3v3l0PmenT1",
-      // environment: "PDEV1",
+      username: "RVTechnologies.User1",
+      password: "inoapps",
+      environment: "PDEV1",
 
       // username: "PROC_EMP",
       // password: "Skanska123",
       // environment: "PDEV1",
 
-      // username: "PROC_EMP",
-      // password: "Skanska123",
-      // environment: "SKAD3",
+      // username: 'PROC_EMP',
+      // password: 'Skanska123',
+      // environment: 'SKAD3',
 
       // username: 'Products.User',
       // password: 'Welcome41',
-      // environment: 'PDEV1',
+      // environment: 'PDEV2',
 
-      username: "",
-      password: "",
-      environment: "",
+      // username: "",
+      // password: "",
+      // environment: "",
 
       envURL: '',
       isLoading: false,
@@ -72,6 +74,12 @@ class Login extends Component {
   // }
 
   async getEnvironment() {
+    //   fetch('https://pdev2a1-inoapps4.inoapps.com/ords/inoapps_ec/grn.mobility.v1/getPurchaseOrder/RVTechnologies.User1')
+    // .then(response => response.json())
+    // .then(json => console.log(json,'res>>>>>>>>>>>>>>>>>>>>')).catch((err)=>{
+    //   console.log(err,'coming in errr>>>>>>>');
+    // })
+    //   return
     if (!this.state.environment) {
       Alert.alert('', 'Please enter an environment.', [{text: 'OK'}], {
         cancelable: false,
@@ -225,6 +233,16 @@ class Login extends Component {
   // MARK: API
 
   getLogin(envURL) {
+    // fetch('https://jsonplaceholder.typicode.com/todos/1')
+    //   .then(response => response.json())
+    //   .then(json => console.log(json,'res>>>>>>>>>>>>>>>>'));
+
+    // axios.get('https://pdev2a1-inoapps4.inoapps.com/ords/inoapps_ec/grn.mobility.v1/getPurchaseOrder/RVTechnologies.User1').then(response => {
+    //   console.log(response.data);
+    // }).catch((err)=>{
+    //   console.log(err,'errr');
+    // })
+    // return;
     if (envURL == 'https://www.google.com') {
       return alert('Please enter right Environment!');
     }
@@ -240,6 +258,19 @@ class Login extends Component {
     } else {
       this.setState({isLoading: true});
       const params = [this.state.username, this.state.password];
+
+      // axios .post('http://pdev1a1-inoapps4.inoapps.com/ords/inoapps_ec/grn.mobility.v1/PostLogin', {
+      //   firstName:this.state.username,
+      //   lastName: this.state.password
+      // })
+      // .then((response) => {
+      //   console.log(response,'res>>>>>>>>>>>>');
+      // }, (error) => {
+      //   console.log(error,'errr>>>>>>>>>>>>>>>');
+      //   this.setState({isLoading: false});
+
+      // });
+      // return
 
       this.api['getLogin'].apply(this, params).then(result => {
         this.setState({isLoading: false});
