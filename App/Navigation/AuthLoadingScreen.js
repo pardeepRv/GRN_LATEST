@@ -13,7 +13,12 @@ export default class AuthLoadingScreen extends React.Component {
     console.log(username, 'consling username here>>>>>>>>>>>>>>1111');
     console.log(this.props, 'this.propsthis.propsthis.propsthis.props111');
     console.log(username, 'lengthlength');
-    this.props.navigation.navigate(username == undefined ? 'Auth' : 'App');
+
+    // commented for persist as per client requiremnets
+
+    // this.props.navigation.navigate(username == undefined ? 'Auth' : 'App');
+
+    this.props.navigation.navigate('Auth');
   };
 
   // Render any loading content that you like here
