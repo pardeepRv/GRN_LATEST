@@ -197,18 +197,27 @@ class GrnPurchaseOrderDetails extends Component {
     const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
     this.api = API.create(this.state.envUrl);
 
-    const params = [username, 'testPhotoName', this.data];
-    let result = await this.api['postPhoto'].apply(this, params);
-
-    console.log('result of pic api in sending to frst screen ', result);
-
-    if (result.ok) {
-      console.log('Response API ok: ', result.data);
-      updatedData.forEach((element, idx) => {
-        if (element.edited && idx == index) {
-          updatedData[idx].file_id = result.data.REQUEST_ID;
-        }
+    if (photoURL != undefined) {
+      let formdata = new FormData();
+      formdata.append('photo', {
+        uri: photoURL,
+        type: 'image/jpeg',
+        name: 'testPhotoName',
       });
+
+      const params = [username, 'testPhotoName', formdata];
+      let result = await this.api['postPhoto'].apply(this, params);
+
+      console.log('result of pic api in sending to frst screen ', result);
+
+      if (result.ok) {
+        console.log('Response API ok: ', result.data);
+        updatedData.forEach((element, idx) => {
+          if (element.edited && idx == index) {
+            updatedData[idx].file_id = result.data.REQUEST_ID;
+          }
+        });
+      }
     }
     console.log(updatedData, 'updatedDataupdatedData<><>');
     this.setState({
