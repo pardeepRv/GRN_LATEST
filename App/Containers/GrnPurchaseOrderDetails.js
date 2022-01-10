@@ -191,7 +191,8 @@ class GrnPurchaseOrderDetails extends Component {
       edited: edited,
       comments: comments,
       photoURL: photoURL,
-      quantity_received: parseInt(quantity),
+      // quantity_received: parseInt(quantity),  //commented bcoz of client req
+      quantity_received: quantity,
     };
 
     const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');

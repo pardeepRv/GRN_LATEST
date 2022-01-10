@@ -1,33 +1,28 @@
 import React, {Component} from 'react';
 import {
+  Alert,
+  Image,
+  KeyboardAvoidingView,
   ScrollView,
   Text,
-  KeyboardAvoidingView,
-  View,
-  TouchableOpacity,
   TextInput,
-  Image,
-  Dimensions,
-  Alert,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {connect} from 'react-redux';
 // import ImagePicker from 'react-native-image-picker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-
+import Spinner from 'react-native-loading-spinner-overlay';
+import {connect} from 'react-redux';
+import API from '../../App/Services/Api';
+// For API
+import CreateReceiptsAPIHelper from '../APIHelper/CreateReceiptsAPIHelper';
 import DBGrnPurchaseOrderDataHelper from '../DB/DBGrnPurchaseOrderDataHelper';
 import CreateReceipt from '../Models/CreateReceipt';
-import Spinner from 'react-native-loading-spinner-overlay';
 import Utils from '../Utils/Utils';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
-
 // Styles
 import styles from './Styles/GrnReceiptDetailsStyle';
-// For API
-import CreateReceiptsAPIHelper from '../APIHelper/CreateReceiptsAPIHelper';
-import FJSON from 'format-json';
-import API from '../../App/Services/Api';
-import EnvironmentVar from '../Config/EnvironmentVar';
 
 class GrnReceiptDetails extends Component {
   api = {};
@@ -336,6 +331,7 @@ class GrnReceiptDetails extends Component {
           'Entered amount cannot be higher than open quantity.',
         );
       } else {
+        console.log(this.state.quantity, 'this.state.quantity339');
         //save to local
         // this.saveCreateReceipt(this.state.comments, this.photoURI, this.state.quantity)
         this.props.navigation.state.params.returnData(
@@ -344,7 +340,7 @@ class GrnReceiptDetails extends Component {
           this.photoURI,
           this.state.quantity,
           this.state.index,
-          this.file_id
+          this.file_id,
         );
         this.props.navigation.pop();
       }
@@ -382,47 +378,60 @@ class GrnReceiptDetails extends Component {
     );
   }
 
-  selectPhotoTapped() {
-    const options = {
-      quality: 1.0,
-      maxWidth: 500,
-      maxHeight: 500,
-      mediaType: 'photo',
+  _doOpenOption = () => {
+    Alert.alert(
+      '',
+      'Please Select',
+      [
+        {text: 'Camera', onPress: () => this.selectPhotoTapped()},
+        {text: 'Gallery', onPress: () => this.imageGalleryLaunch()},
+        {
+          text: 'Cancel',
+          onPress: () => console.log('err'),
+          style: 'cancel',
+        },
+      ],
+      {cancelable: true},
+    );
+  };
 
+  //select image from camera
+  selectPhotoTapped() {
+    let options = {
       storageOptions: {
         skipBackup: true,
-        cameraRoll: true,
-        path: 'ReceiptsPhotos',
+        path: 'images',
       },
+      maxWidth: 400,
+      maxHeight: 400,
     };
-
-    ImagePicker.showImagePicker(options, response => {
-      console.log('Response = ', response);
-
-      if (response.didCancel) {
-        console.log('User cancelled photo picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
+    launchCamera(options, res => {
+      console.log(res, 'ggeting while clicking pic');
+      if (res.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (res.error) {
+        console.log('ImagePicker Error: ', res.error);
       } else {
         let source = {
-          uri: response.uri,
+          uri: res && res.assets && res.assets.length > 0 && res.assets[0].uri,
         };
-        this.setState({img: source});
-        this.photoURI = source.uri;
+        this.setState({
+          img: source,
+        });
+        this.photoURI =
+          res && res.assets && res.assets.length > 0 && res.assets[0].uri;
         this.data = new FormData();
         this.data.append('photo', {
-          uri: response.uri,
-          type: 'image/jpeg', // or photo.type
-          name: 'testPhotoName',
+          uri: res && res.assets && res.assets.length > 0 && res.assets[0].uri,
+          type:
+            res && res.assets && res.assets.length > 0 && res.assets[0].type, // or photo.type
+          name: 'recieptpic',
         });
-        // You can also display the image using data:
-        // let source = { uri: 'data:image/jpeg;base64,' + response.data };
       }
     });
   }
 
+  //select image from gallery
   imageGalleryLaunch = () => {
     let options = {
       storageOptions: {
@@ -674,9 +683,13 @@ class GrnReceiptDetails extends Component {
                       {entityPurchaseOrder.item_number}
                     </Text>
                   </View>
-                  <View style={[styles.greyInfoContainer]}>
+                  <View style={[styles.greyInfoContainer, {}]}>
                     <Text style={styles.infoTextLeft}>Description</Text>
-                    <Text style={[styles.infoText, {width: 200}]}>
+                    <Text
+                      style={[
+                        styles.infoText,
+                        {width: 200, textAlign: 'right'},
+                      ]}>
                       {this.state.entityPurchaseOrder.item_description}
                     </Text>
                   </View>
@@ -755,7 +768,8 @@ class GrnReceiptDetails extends Component {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               onPress={() => {
-                this.imageGalleryLaunch();
+                this._doOpenOption();
+                // this.imageGalleryLaunch();
                 return;
                 this.selectPhotoTapped();
               }}

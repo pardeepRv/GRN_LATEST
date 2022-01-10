@@ -1,30 +1,22 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
-  ScrollView,
-  Text,
-  KeyboardAvoidingView,
-  View,
-  TouchableOpacity,
-  TextInput,
-  Image,
-  Alert,
+  Alert, Image, KeyboardAvoidingView, ScrollView,
+  Text, TextInput, TouchableOpacity, View
 } from 'react-native';
-import {connect} from 'react-redux';
 // import ImagePicker from "react-native-image-picker";
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-
-import DBGrnReceiptDataHelper from '../DB/DBGrnReceiptDataHelper';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Spinner from 'react-native-loading-spinner-overlay';
-import Utils from '../Utils/Utils';
-
-// Add Actions - replace 'Your' with whatever your reducer is called :)
-// import YourActions from '../Redux/YourRedux'
-
-// Styles
-import styles from './Styles/GrnChangeReceiptStyle';
+import { connect } from 'react-redux';
 // For API
 import API from '../../App/Services/Api';
-import FJSON from 'format-json';
+import DBGrnReceiptDataHelper from '../DB/DBGrnReceiptDataHelper';
+import Utils from '../Utils/Utils';
+// Add Actions - replace 'Your' with whatever your reducer is called :)
+// import YourActions from '../Redux/YourRedux'
+// Styles
+import styles from './Styles/GrnChangeReceiptStyle';
+
+
 
 class GrnChangeReceipt extends Component {
   api = {};
@@ -133,7 +125,7 @@ class GrnChangeReceipt extends Component {
         'https://skap1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
-    }else if (environment == 'GTDEV1') {
+    } else if (environment == 'GTDEV1') {
       envURL =
         'https://gtdev1a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
@@ -276,8 +268,8 @@ class GrnChangeReceipt extends Component {
     file_id,
     receipt_id,
   ) {
-
-      console.log( order_number,
+    console.log(
+      order_number,
       order_line_number,
       quantity,
       unit_of_measure,
@@ -290,8 +282,10 @@ class GrnChangeReceipt extends Component {
       receive_tran_id,
       type,
       file_id,
-      receipt_id,'cwcwcwcwcwcewcwcw>>>>>>>>>>>>>>>>>>>>>');
-     this.setState({isLoading: true});
+      receipt_id,
+      'cwcwcwcwcwcewcwcw>>>>>>>>>>>>>>>>>>>>>',
+    );
+    this.setState({isLoading: true});
 
     const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
     const response = await this.api.postCorrectReceipt(
@@ -309,7 +303,7 @@ class GrnChangeReceipt extends Component {
       receive_tran_id,
       type,
       file_id,
-      receipt_id
+      receipt_id,
     );
 
     this.setState({isLoading: false});
@@ -455,6 +449,23 @@ class GrnChangeReceipt extends Component {
     }, 100);
   }
 
+  _doOpenOption = () => {
+    Alert.alert(
+      '',
+      'Please Select',
+      [
+        {text: 'Camera', onPress: () => this.selectPhotoTapped()},
+        {text: 'Gallery', onPress: () => this.imageGalleryLaunch()},
+        {
+          text: 'Cancel',
+          onPress: () => console.log('err'),
+          style: 'cancel',
+        },
+      ],
+      {cancelable: true},
+    );
+  };
+
   imageGalleryLaunch = () => {
     let options = {
       storageOptions: {
@@ -503,28 +514,12 @@ class GrnChangeReceipt extends Component {
       maxHeight: 400,
     };
     launchCamera(options, res => {
+      console.log(res, 'ggeting while clicking pic');
       if (res.didCancel) {
         console.log('User cancelled image picker');
       } else if (res.error) {
         console.log('ImagePicker Error: ', res.error);
-      } else if (res.customButton) {
-        console.log('User tapped ');
-      } 
-      // else {
-      //   let source = {uri: res.uri};
-      //   this.setState({
-      //     img: source,
-      //   });
-      //   this.photoURI = source.uri;
-      //   this.data = new FormData();
-      //   this.data.append('photo', {
-      //     uri: res.uri,
-      //     type: 'image/jpeg', // or photo.type
-      //     name: 'testPhotoName',
-      //   });
-      // }
-
-      else {
+      } else {
         let source = {
           uri: res && res.assets && res.assets.length > 0 && res.assets[0].uri,
         };
@@ -536,46 +531,9 @@ class GrnChangeReceipt extends Component {
         this.data = new FormData();
         this.data.append('photo', {
           uri: res && res.assets && res.assets.length > 0 && res.assets[0].uri,
-          type: 'image/jpeg', // or photo.type
-          name: 'testPhotoName',
-        });
-      }
-
-    });
-    return;
-    // const options = {
-    //   quality: 1.0,
-    //   maxWidth: 500,
-    //   maxHeight: 500,
-    //   mediaType: 'photo',
-
-    //   storageOptions: {
-    //     skipBackup: true,
-    //     cameraRoll: true,
-    //     path: 'ReceiptsPhotos',
-    //   },
-    // };
-
-    ImagePicker.showImagePicker(options, response => {
-      console.log('Response = ', response);
-
-      if (response.didCancel) {
-        console.log('User cancelled photo picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        let source = {uri: response.uri};
-        this.setState({
-          img: source,
-        });
-        this.photoURI = source.uri;
-        this.data = new FormData();
-        this.data.append('photo', {
-          uri: source,
-          type: 'image/jpeg', // or photo.type
-          name: 'testPhotoName',
+          type:
+            res && res.assets && res.assets.length > 0 && res.assets[0].type, // or photo.type
+          name: 'recieptpic',
         });
       }
     });
@@ -679,24 +637,24 @@ class GrnChangeReceipt extends Component {
                   </Text>
                 </View> */}
                 <View
-                    style={{
-                      padding: 10,
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      backgroundColor: '#FCE8E7',
-                      alignItems: 'center',
-                    }}>
-                    <Text style={[styles.infoTextLeft, {paddingLeft: 10}]}>
-                      Description
-                    </Text>
-                    <Text
-                      style={[
-                        styles.infoText,
-                        {width: 110, alignSelf: 'center'},
-                      ]}>
-                      {this.state.entityReceipt.item_description}
-                    </Text>
-                  </View>
+                  style={{
+                    padding: 10,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    backgroundColor: '#FCE8E7',
+                    alignItems: 'center',
+                  }}>
+                  <Text style={[styles.infoTextLeft, {paddingLeft: 10}]}>
+                    Description
+                  </Text>
+                  <Text
+                    style={[
+                      styles.infoText,
+                      {width: 110, alignSelf: 'center'},
+                    ]}>
+                    {this.state.entityReceipt.item_description}
+                  </Text>
+                </View>
                 <View style={styles.greyInfoContainer}>
                   <Text style={styles.infoTextLeft}>UOM</Text>
                   <Text style={styles.infoText}>
@@ -751,6 +709,8 @@ class GrnChangeReceipt extends Component {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={() => {
+              this._doOpenOption();
+              return;
               // this.selectPhotoTapped();
               this.imageGalleryLaunch();
             }}

@@ -1,32 +1,25 @@
 import React, {Component} from 'react';
 import {
+  Alert,
+  Image,
+  KeyboardAvoidingView,
   SafeAreaView,
   ScrollView,
   Text,
-  View,
   TextInput,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Image,
-  Alert,
+  View,
 } from 'react-native';
-import {connect} from 'react-redux';
-// import ImagePicker from 'react-native-image-picker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-
+import Spinner from 'react-native-loading-spinner-overlay';
+import {connect} from 'react-redux';
 import DBGrnReceiptDataHelper from '../DB/DBGrnReceiptDataHelper';
 import DBPCStaticDataHelper from '../DB/DBPCStaticDataHelper';
-import Spinner from 'react-native-loading-spinner-overlay';
-import Utils from '../Utils/Utils';
-// Add Actions - replace 'Your' with whatever your reducer is called :)
-// import YourActions from '../Redux/YourRedux'
-import {Container, Content, Picker} from 'native-base';
-import {Images} from '../Themes';
-// Styles
-import styles from './Styles/GrnRejectReceiptStyle';
 // For API
 import API from '../Services/Api';
-import FJSON from 'format-json';
+import Utils from '../Utils/Utils';
+// Styles
+import styles from './Styles/GrnRejectReceiptStyle';
 
 class GrnRejectReceipt extends Component {
   api = {};
@@ -475,6 +468,23 @@ class GrnRejectReceipt extends Component {
     }, 100);
   }
 
+  _doOpenOption = () => {
+    Alert.alert(
+      '',
+      'Please Select',
+      [
+        {text: 'Camera', onPress: () => this.selectPhotoTapped()},
+        {text: 'Gallery', onPress: () => this.imageGalleryLaunch()},
+        {
+          text: 'Cancel',
+          onPress: () => console.log('err'),
+          style: 'cancel',
+        },
+      ],
+      {cancelable: true},
+    );
+  };
+
   imageGalleryLaunch = () => {
     let options = {
       storageOptions: {
@@ -514,49 +524,38 @@ class GrnRejectReceipt extends Component {
   };
 
   selectPhotoTapped() {
-    const options = {
-      quality: 1.0,
-      maxWidth: 500,
-      maxHeight: 500,
-      mediaType: 'photo',
-
+    let options = {
       storageOptions: {
         skipBackup: true,
-        cameraRoll: true,
-        path: 'ReceiptsPhotos',
+        path: 'images',
       },
+      maxWidth: 400,
+      maxHeight: 400,
     };
-    console.log('selectPhotoTapped');
-
-    ImagePicker.showImagePicker(
-      options,
-      response => {
-        console.log('Response = ', response);
-
-        if (response.didCancel) {
-          console.log('User cancelled photo picker');
-        } else if (response.error) {
-          console.log('ImagePicker Error: ', response.error);
-        } else if (response.customButton) {
-          console.log('User tapped custom button: ', response.customButton);
-        } else {
-          let source = {uri: response.uri};
-          this.setState({
-            img: source,
-          });
-          this.photoURI = source.uri;
-          this.data = new FormData();
-          this.data.append('photo', {
-            uri: source,
-            type: 'image/jpeg', // or photo.type
-            name: 'testPhotoName',
-          });
-        }
-      },
-      err => {
-        console.log('Error = ', JSON.stringify(err));
-      },
-    );
+    launchCamera(options, res => {
+      console.log(res, 'ggeting while clicking pic');
+      if (res.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (res.error) {
+        console.log('ImagePicker Error: ', res.error);
+      } else {
+        let source = {
+          uri: res && res.assets && res.assets.length > 0 && res.assets[0].uri,
+        };
+        this.setState({
+          img: source,
+        });
+        this.photoURI =
+          res && res.assets && res.assets.length > 0 && res.assets[0].uri;
+        this.data = new FormData();
+        this.data.append('photo', {
+          uri: res && res.assets && res.assets.length > 0 && res.assets[0].uri,
+          type:
+            res && res.assets && res.assets.length > 0 && res.assets[0].type, // or photo.type
+          name: 'recieptpic',
+        });
+      }
+    });
   }
 
   showAlertMessage(alertMessage) {
@@ -798,8 +797,9 @@ class GrnRejectReceipt extends Component {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={() => {
-              this.imageGalleryLaunch();
+              this._doOpenOption();
               return;
+              this.imageGalleryLaunch();
               this.selectPhotoTapped();
             }}
             style={styles.buttonStyle}>
