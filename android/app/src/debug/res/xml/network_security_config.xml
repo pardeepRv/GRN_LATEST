@@ -5,7 +5,9 @@
         <domain includeSubdomains="true">https://pdev1a1-inoapps4.inoapps.com/ords/inoapps_ec/</domain>
         <domain includeSubdomains="true">10.0.2.2</domain>
          <trust-anchors>
-            <certificates src="@raw/sfig"/>
+            <!-- <certificates src="@raw/sfig"/> -->
+            
+            <certificates src="@raw/gdrootg2"/>
         </trust-anchors>
     </domain-config>
 </network-security-config>

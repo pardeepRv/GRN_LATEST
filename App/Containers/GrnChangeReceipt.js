@@ -1,12 +1,18 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
-  Alert, Image, KeyboardAvoidingView, ScrollView,
-  Text, TextInput, TouchableOpacity, View
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 // import ImagePicker from "react-native-image-picker";
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Spinner from 'react-native-loading-spinner-overlay';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 // For API
 import API from '../../App/Services/Api';
 import DBGrnReceiptDataHelper from '../DB/DBGrnReceiptDataHelper';
@@ -15,8 +21,6 @@ import Utils from '../Utils/Utils';
 // import YourActions from '../Redux/YourRedux'
 // Styles
 import styles from './Styles/GrnChangeReceiptStyle';
-
-
 
 class GrnChangeReceipt extends Component {
   api = {};
@@ -211,11 +215,12 @@ class GrnChangeReceipt extends Component {
 
     this.setState({isLoading: false});
     setTimeout(async () => {
+      console.log(result, 'console here of image');
       if (result.ok) {
-        console.log('Response API ok: ', result.data);
+        console.log('Response API ok: of image Uploaded', result);
         this.file_id = result.data.REQUEST_ID;
 
-        console.log('Response API ok:???>>>>> ', result.data);
+        console.log('Response image Uploaded ', result.data);
         //update file id to local
         // let updatedReceipt = await this.updateChangeReceipt(
         //   this.receipt_id,
@@ -247,7 +252,8 @@ class GrnChangeReceipt extends Component {
           'Response API: failed',
           result.status + ' - ' + result.problem,
         );
-        this.submitFailedAlert();
+        // this.submitFailedAlert();
+        alert(result.status + ' - ' + result.problem);
       }
     }, 100);
   }
@@ -340,7 +346,7 @@ class GrnChangeReceipt extends Component {
 
         Alert.alert(
           '',
-          'Unable to submit the change receipt as there is no internet connection. The change order will be submitted when there is connection.',
+          'Unable to create the receipts(s) as there is no internet connection. Please recreate the receipts(s) when the connection is restored.',
           [{text: 'OK', onPress: () => this.props.navigation.popToTop()}],
           {cancelable: false},
         );
@@ -448,6 +454,42 @@ class GrnChangeReceipt extends Component {
       }
     }, 100);
   }
+  test_function = (body) => {
+      console.log(body,'to console');
+    debugger
+    // let body = new FormData();
+    // body.append('photo', {
+    //   uri: 'file:///var/mobile/Containers/Data/Application/D41A2EDB-847E-493D-870D-A779120EAC4F/tmp/000E1250-7D6A-4AD5-A549-67C6ECD7827C.jpg',
+    //   name: 'newPic',
+    //   filename: 'imageName.png',
+    //   type: 'image/jpeg',
+    // });
+
+    // body.append('Content-Type', 'image/png');
+
+    fetch(
+      `https://pdev1a1-inoapps4.inoapps.com/ords/inoapps_ec/grn.mobility.v1/postPhoto/RVTECHNOLOGIES.USER1,testPhotoName`,
+      {
+        method: 'post',
+        body: body,
+        headers:{  
+          "Content-Type": "multipart/form-data",
+          "otherHeader": "foo",
+          }
+      },
+    )
+      .then(response => {
+      console.log(response,'in response');
+      
+        response.json();
+      })
+      .then(response => {
+        console.log('response in fetch', response);
+      })
+      .catch(error => {
+        console.log('error in fetch', error);
+      });
+  };
 
   _doOpenOption = () => {
     Alert.alert(
@@ -497,9 +539,11 @@ class GrnChangeReceipt extends Component {
         this.data = new FormData();
         this.data.append('photo', {
           uri: res && res.assets && res.assets.length > 0 && res.assets[0].uri,
-          type: 'image/jpeg', // or photo.type
+          type: res && res.assets && res.assets.length > 0 && res.assets[0].type,//'image/jpeg', // or photo.type
           name: 'testPhotoName',
         });
+        // this.data.append('Content-Type', 'image/png');
+              // this.test_function(this.data);
       }
     });
   };
@@ -531,8 +575,8 @@ class GrnChangeReceipt extends Component {
         this.data = new FormData();
         this.data.append('photo', {
           uri: res && res.assets && res.assets.length > 0 && res.assets[0].uri,
-          type:
-            res && res.assets && res.assets.length > 0 && res.assets[0].type, // or photo.type
+          type: 'image/jpeg',
+          // res && res.assets && res.assets.length > 0 && res.assets[0].type, // or photo.type
           name: 'recieptpic',
         });
       }
@@ -709,6 +753,7 @@ class GrnChangeReceipt extends Component {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={() => {
+              // this.test_function();
               this._doOpenOption();
               return;
               // this.selectPhotoTapped();

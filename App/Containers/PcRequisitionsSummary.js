@@ -217,7 +217,7 @@ class PcRequisitionsSummary extends Component {
 
         Alert.alert(
           "",
-          "Unable to submit the requisition as there is no internet connection. The change order will be submitted when there is connection.",
+          "Unable to create the receipts(s) as there is no internet connection. Please recreate the receipts(s) when the connection is restored.",
           [{ text: "OK", onPress: () => this.props.navigation.popToTop() }],
           { cancelable: false }
         );

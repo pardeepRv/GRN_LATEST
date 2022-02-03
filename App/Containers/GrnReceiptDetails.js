@@ -479,7 +479,7 @@ class GrnReceiptDetails extends Component {
     let result = await this.api['postPhoto'].apply(this, params);
 
     this.setState({isLoading: false});
-
+    console.log(result,'Result of image Api>>>>>>');
     setTimeout(async () => {
       if (result.ok) {
         console.log('Response API ok: ', result.data);
@@ -513,7 +513,8 @@ class GrnReceiptDetails extends Component {
           'pending',
           this.state.index,
         );
-        this.submitFailedAlert();
+        alert(result.status + ' - ' + result.problem)
+        // this.submitFailedAlert();
         console.log(
           'Response API: failed',
           result.status + ' - ' + result.problem,

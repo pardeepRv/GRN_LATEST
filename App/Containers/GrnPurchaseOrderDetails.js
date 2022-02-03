@@ -278,7 +278,7 @@ class GrnPurchaseOrderDetails extends Component {
   submitFailedAlert() {
     Alert.alert(
       '',
-      'Unable to submit the receipts as there is no internet connection. The receipt will be submitted when there is connection.',
+      'Unable to create the receipts(s) as there is no internet connection. Please recreate the receipts(s) when the connection is restored.',
       [{text: 'OK', onPress: this.refreshData}],
       {cancelable: false},
     );
@@ -531,7 +531,7 @@ class GrnPurchaseOrderDetails extends Component {
     );
 
     this.setState({isLoading: false});
-
+    console.log(response, 'response from Image API');
     setTimeout(() => {
       if (response.ok) {
         console.log('Print Receipts', this.state.createReceiptObjects);

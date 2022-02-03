@@ -140,7 +140,7 @@ export default StyleSheet.create({
   rowSection1Pending: {
     width: "5%",
     alignItems: "stretch",
-    backgroundColor: "rgba(255,128,0,1)",
+    // backgroundColor: "rgba(255,128,0,1)", //commented as per req of client
     justifyContent: "center",
   },
   rowSection1Processing: {
