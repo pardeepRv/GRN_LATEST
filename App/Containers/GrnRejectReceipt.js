@@ -375,7 +375,7 @@ class GrnRejectReceipt extends Component {
         //To Do : save receipt Data
         Alert.alert(
           '',
-          'Unable to create the receipts(s) as there is no internet connection. Please recreate the receipts(s) when the connection is restored.',
+          'Unable to create the reject receipt as there is no internet connection. Please recreate the reject receipt when the connection is restored.',
           [{text: 'OK', onPress: () => this.props.navigation.popToTop()}],
           {cancelable: false},
         );
@@ -593,7 +593,7 @@ class GrnRejectReceipt extends Component {
   submitFailedAlert() {
     Alert.alert(
       '',
-      'Unable to reject the receipt as there is no internet connection. The receipt will be rejected when there is connection.',
+      'Unable to create the reject receipt as there is no internet connection. Please recreate the reject receipt when the connection is restored.',
       [{text: 'OK', onPress: () => this.props.navigation.popToTop()}],
       {cancelable: false},
     );

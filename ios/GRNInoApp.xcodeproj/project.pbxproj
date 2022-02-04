@@ -31,13 +31,6 @@
 			remoteGlobalIDString = F60690131CA2766F0003FB26;
 			remoteInfo = RealmReact;
 		};
-		CE71AA9E26F1F3FD00B453A6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AA49C10F5BCB48BFB2C6EC46 /* RealmReact.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 85B358BB25FF8070003A02D4;
-			remoteInfo = GCDWebServer;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -180,7 +173,6 @@
 			isa = PBXGroup;
 			children = (
 				CE71AA9426F1EFF100B453A6 /* libRealmReact.a */,
-				CE71AA9F26F1F3FD00B453A6 /* libGCDWebServer.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -277,13 +269,6 @@
 			fileType = archive.ar;
 			path = libRealmReact.a;
 			remoteRef = CE71AA9326F1EFF100B453A6 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		CE71AA9F26F1F3FD00B453A6 /* libGCDWebServer.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libGCDWebServer.a;
-			remoteRef = CE71AA9E26F1F3FD00B453A6 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -524,7 +509,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 17;
+				CURRENT_PROJECT_VERSION = 18;
 				DEVELOPMENT_TEAM = SFV2367NMH;
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = (
@@ -560,7 +545,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 17;
+				CURRENT_PROJECT_VERSION = 18;
 				DEVELOPMENT_TEAM = SFV2367NMH;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
