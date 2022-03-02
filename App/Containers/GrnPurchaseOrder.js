@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   View,
   Text,
@@ -9,14 +9,16 @@ import {
   TouchableHighlight,
   ActivityIndicator,
 } from 'react-native';
-import { connect } from 'react-redux';
-import { Images } from '../Themes';
+import {connect} from 'react-redux';
+import {Images} from '../Themes';
 import GrnPurchaseOrderDetails from '././GrnPurchaseOrderDetails';
 import DBGrnPurchaseOrderDataHelper from '../DB/DBGrnPurchaseOrderDataHelper';
+import CreateReceiptsAPIHelper from '../APIHelper/CreateReceiptsAPIHelper';
+
 import AppConfig from '../Config/AppConfig';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Utils from '../Utils/Utils';
-import { NavigationEvents } from 'react-navigation';
+import {NavigationEvents} from 'react-navigation';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
@@ -26,6 +28,8 @@ import styles from './Styles/GrnPurchaseOrderStyle';
 // For API
 import API from '../../App/Services/Api';
 import FJSON from 'format-json';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 
 class GrnPurchaseOrder extends React.PureComponent {
   api = {};
@@ -47,11 +51,301 @@ class GrnPurchaseOrder extends React.PureComponent {
     };
   }
 
+  //getting all data from local storage
+  getAllDataFromLocalStorage = async () => {
+    console.log('coming in home screen');
+    const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
+
+    NetInfo.fetch().then(async state => {
+      console.log('Connection type', state.type);
+      console.log('Is connected?', state.isConnected);
+      if (state && state.isConnected) {
+        try {
+          const keys = await AsyncStorage.getAllKeys();
+          console.log(keys, 'keys in store...');
+          const result = await AsyncStorage.multiGet(keys);
+          console.log(result, 'result in store...');
+
+          let updatedArr = result.filter((val, index) => {
+            if (
+              val[0] != 'savingArr' &&
+              val[0] != 'USER_NAME' &&
+              val[0] != 'ENVIRONMENT'
+            ) {
+              return val;
+            }
+          });
+          console.log(updatedArr, 'updatedArrupdatedArr');
+          updatedArr.map(async req => {
+            console.log(req, 'req');
+            if (req[0] == 'SAVE_ENTIRE_PO') {
+              console.log('first');
+              if (req && req.length > 1) {
+                let entireArr = JSON.parse(req[1]);
+
+                if (entireArr.length > 0) {
+                  const response =
+                    await CreateReceiptsAPIHelper.postCreateReceipt(
+                      username,
+                      entireArr,
+                      this.state.envURL,
+                    );
+                  console.log(
+                    response,
+                    'Res from create receipt api Save entire PO',
+                  );
+                  setTimeout(async () => {
+                    if (response && response.ok) {
+                      console.log('Response API ok: ', response.data);
+                      await AsyncStorage.removeItem('SAVE_ENTIRE_PO');
+                    } else {
+                      console.log('Response API: failed 99', response.problem);
+                    }
+                  }, 100);
+                } else {
+                  console.log('Please check your internet connection.');
+                }
+              }
+            } else if (req[0] == 'SAVE_MULTILINE_PO') {
+              if (req && req.length > 1) {
+                let multiLineArr = JSON.parse(req[1]);
+
+                if (multiLineArr.length > 0) {
+                  const response =
+                    await CreateReceiptsAPIHelper.postCreateReceipt(
+                      username,
+                      multiLineArr,
+                      this.state.envURL,
+                    );
+                  console.log(
+                    response,
+                    'Res from create receipt api Save multiline Arr',
+                  );
+                  setTimeout(async () => {
+                    if (response && response.ok) {
+                      console.log('Response API ok: ', response.data);
+                      await AsyncStorage.removeItem('SAVE_MULTILINE_PO');
+                    } else {
+                      console.log('Response API: failed 99', response.problem);
+                    }
+                  }, 100);
+                } else {
+                  console.log('Please check your internet connection.');
+                }
+              }
+            } else if (req[0] == 'SAVE_SINGLE_LINE_PO') {
+              console.log('thisrd');
+              if (req && req.length > 1) {
+                let singleLineArr = JSON.parse(req[1]);
+
+                if (singleLineArr.length > 0) {
+                  const response =
+                    await CreateReceiptsAPIHelper.postCreateReceipt(
+                      username,
+                      singleLineArr,
+                      this.state.envURL,
+                    );
+                  console.log(
+                    response,
+                    'Res from create receipt api Save singleline',
+                  );
+                  setTimeout(async () => {
+                    if (response && response.ok) {
+                      console.log('Response API ok: ', response.data);
+                      await AsyncStorage.removeItem('SAVE_SINGLE_LINE_PO');
+                    } else {
+                      console.log('Response API: failed 99', response.problem);
+                    }
+                  }, 100);
+                } else {
+                  console.log('Please check your internet connection.');
+                }
+              }
+            } else if (req[0] == 'SAVE_CHANGE_RECEIPT') {
+              console.log('fourth');
+
+              let chnageRecpObject = JSON.parse(req[1]);
+              console.log(chnageRecpObject, 'chnageRecpObjectchnageRecpObject');
+
+              let size = Object.keys(chnageRecpObject).length;
+
+              let order_number;
+              let order_line_number;
+              let quantity;
+              let unit_of_measure;
+              let item_number;
+              let item_description;
+              let to_organization;
+              let comments;
+              let receipt_num;
+              let deliver_tran_id;
+              let receive_tran_id;
+              let type;
+              let file_id;
+
+              for (const [key, value] of Object.entries(chnageRecpObject)) {
+                console.log(`${key}: ${value}`);
+                if (key == 'order_number') {
+                  order_number = value;
+                } else if (key == 'order_line_number') {
+                  order_line_number = value;
+                } else if (key == 'quantity') {
+                  quantity = value;
+                } else if (key == 'unit_of_measure') {
+                  unit_of_measure = value;
+                } else if (key == 'item_number') {
+                  item_number = value;
+                } else if (key == 'item_description') {
+                  item_description = value;
+                } else if (key == 'to_organization') {
+                  to_organization = value;
+                } else if (key == 'comments') {
+                  comments = value;
+                } else if (key == 'receipt_num') {
+                  receipt_num = value;
+                } else if (key == 'deliver_tran_id') {
+                  deliver_tran_id = value;
+                } else if (key == 'receive_tran_id') {
+                  receive_tran_id = value;
+                } else if (key == 'file_id') {
+                  file_id = value;
+                } else if (key == 'type') {
+                  type = value;
+                }
+              }
+              if (size > 0) {
+                this.api = new API.create(this.state.envURL);
+
+                const response = await this.api.postCorrectReceipt(
+                  username,
+                  order_number,
+                  order_line_number,
+                  quantity,
+                  unit_of_measure,
+                  item_number,
+                  item_description,
+                  to_organization,
+                  comments,
+                  receipt_num,
+                  deliver_tran_id,
+                  receive_tran_id,
+                  type,
+                  file_id,
+                );
+
+                console.log(response, 'Res from change receipt');
+                setTimeout(async () => {
+                  if (response && response.ok) {
+                    console.log('Response API ok: ', response.data);
+                    await AsyncStorage.removeItem('SAVE_CHANGE_RECEIPT');
+                  } else {
+                    console.log('Response API: failed 257', response.problem);
+                  }
+                }, 100);
+              } else {
+                console.log('no object found.');
+              }
+            } else if (req[0] == 'SAVE_REJECT_RECEIPT') {
+              console.log('five');
+
+              let rejectObj = JSON.parse(req[1]);
+                 console.log(rejectObj, 'rejectObjrejectObj');
+
+              let size = Object.keys(rejectObj).length;
+
+              let order_number;
+              let order_line_number;
+              let quantity;
+              let unit_of_measure;
+              let item_number;
+              let item_description;
+              let to_organization;
+              let comments;
+              let receipt_num;
+              let deliver_tran_id;
+              let receive_tran_id;
+              let type;
+              let file_id;
+
+              for (const [key, value] of Object.entries(rejectObj)) {
+                console.log(`${key}: ${value}`);
+                if (key == 'order_number') {
+                  order_number = value;
+                } else if (key == 'order_line_number') {
+                  order_line_number = value;
+                } else if (key == 'quantity') {
+                  quantity = value;
+                } else if (key == 'unit_of_measure') {
+                  unit_of_measure = value;
+                } else if (key == 'item_number') {
+                  item_number = value;
+                } else if (key == 'item_description') {
+                  item_description = value;
+                } else if (key == 'to_organization') {
+                  to_organization = value;
+                } else if (key == 'comments') {
+                  comments = value;
+                } else if (key == 'receipt_num') {
+                  receipt_num = value;
+                } else if (key == 'deliver_tran_id') {
+                  deliver_tran_id = value;
+                } else if (key == 'receive_tran_id') {
+                  receive_tran_id = value;
+                } else if (key == 'file_id') {
+                  file_id = value;
+                } else if (key == 'type') {
+                  type = value;
+                }
+              }
+              if (size > 0) {
+                this.api = new API.create(this.state.envURL);
+
+                const response = await this.api.postCorrectReceipt(
+                  username,
+                  order_number,
+                  order_line_number,
+                  quantity,
+                  unit_of_measure,
+                  item_number,
+                  item_description,
+                  to_organization,
+                  comments,
+                  receipt_num,
+                  deliver_tran_id,
+                  receive_tran_id,
+                  type,
+                  file_id,
+                );
+
+                console.log(response, 'Res from reject receipt');
+                setTimeout(async () => {
+                  if (response && response.ok) {
+                    console.log('Response API ok: ', response.data);
+                    await AsyncStorage.removeItem('SAVE_REJECT_RECEIPT');
+                  } else {
+                    console.log('Response API: failed 326', response.problem);
+                  }
+                }, 100);
+              } else {
+                console.log('no object found.');
+              }
+            }
+          });
+        } catch (error) {
+          console.error(error, 'err while taking from storage...');
+        }
+      } else {
+        alert('Please check your internet connection.');
+      }
+    });
+  };
+
   componentDidMount() {
     this.refreshPayload();
   }
 
   refreshPayload = () => {
+    this.getAllDataFromLocalStorage();
     this.getPurchaseOrderApi();
   };
 
@@ -72,70 +366,114 @@ class GrnPurchaseOrder extends React.PureComponent {
       console.log('New ENV URL ', envURL);
       //this.api = new API.create(envURL);
       console.log(this.api, 'LETS GOOOO');
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'SKAD2') {
       envURL =
         'https://skad2a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
       console.log('New ENV URL ', envURL);
       // this.api = new API.create(envURL);
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'SKAD1') {
       envURL =
         'https://skad1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
       console.log('New ENV URL ', envURL);
       //this.api = new API.create(envURL);
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'SKAT1') {
       envURL =
         'https://skat1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
       console.log('New ENV URL ', envURL);
       //this.api = new API.create(envURL);
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'PTEST2') {
       envURL = 'https://ptest2a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       console.log('New ENV URL ', envURL);
       //this.api = new API.create(envURL);
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'PDEV1') {
       envURL = 'https://pdev1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'PDEV2') {
       envURL = 'https://pdev2a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'PTEST1') {
       envURL = 'https://ptest1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'PDEV3') {
       envURL = 'https://pdev3a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'PTEST3') {
       envURL = 'https://ptest3a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'PDEMO') {
       envURL = 'https://pdemo1a1-inoapps4.inoapps.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'SKAD4') {
       envURL =
         'https://skad4a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
       // this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'SKAD5') {
       envURL =
         'https://skad5a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+      this.setState({
+        envURL: envURL,
+      });
     } else if (environment == 'SKAP') {
       envURL =
         'https://skap1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
-    }
-    else if (environment == 'GTDEV1') {
+      this.setState({
+        envURL: envURL,
+      });
+    } else if (environment == 'GTDEV1') {
       envURL =
         'https://gtdev1a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+      this.setState({
+        envURL: envURL,
+      });
     }
 
     const api = API.create(envURL);
@@ -197,7 +535,7 @@ class GrnPurchaseOrder extends React.PureComponent {
     });
 
     ordersGettingFromApi.map(po => {
-      console.log('coming in po new method', po);
+      // console.log('coming in po new method', po);
       // filter out the status close po
       if (po.header_status.toUpperCase() == 'OPEN') {
         if (po.quantity_available_to_receive > 0) {
@@ -217,7 +555,7 @@ class GrnPurchaseOrder extends React.PureComponent {
     for (let i = 0; i < test.length; i++) {
       let po = test[i];
       if (this.checkPONoExist(this.state.finalPOToDisplay, po)) {
-        console.log('Existing');
+        // console.log('Existing');
       } else {
         console.log(po);
         final.push(po);
@@ -339,7 +677,7 @@ class GrnPurchaseOrder extends React.PureComponent {
   * e.g.
     return <MyCustomCell title={item.title} description={item.description} />
   *************************************************************/
-  renderRow = ({ item }) => {
+  renderRow = ({item}) => {
     return (
       <TouchableHighlight
         onPress={() => {

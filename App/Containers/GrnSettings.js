@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, {Component} from 'react';
 import {
   View,
   Text,
@@ -6,59 +6,95 @@ import {
   ImageBackground,
   TouchableOpacity,
   Alert,
-} from "react-native";
-import { connect } from "react-redux";
-import { Images } from "../Themes";
-import Utils from "../Utils/Utils";
-import Config from "react-native-config";
-import SyncHelper from "../Sync/SyncHelper";
-import Spinner from "react-native-loading-spinner-overlay";
-import DeviceInfo from "react-native-device-info";
+} from 'react-native';
+import {connect} from 'react-redux';
+import {Images} from '../Themes';
+import Utils from '../Utils/Utils';
+import Config from 'react-native-config';
+import SyncHelper from '../Sync/SyncHelper';
+import Spinner from 'react-native-loading-spinner-overlay';
+import DeviceInfo from 'react-native-device-info';
 
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
 // Styles
-import styles from "./Styles/GrnSettingsStyle";
-import EnvironmentVar from "../Config/EnvironmentVar";
-import { NavigationActions, StackActions } from "react-navigation";
+import styles from './Styles/GrnSettingsStyle';
+import EnvironmentVar from '../Config/EnvironmentVar';
+import {NavigationActions, StackActions} from 'react-navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class GrnSettings extends Component {
   static navigationOptions = {
-    title: "SETTINGS",
+    title: 'SETTINGS',
   };
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
+      username: '',
       isLoading: false,
-      envUrl: "",
-      environment: "",
+      envUrl: '',
+      environment: '',
+      dummyArr: [
+        {text: 'one', second: 'hi'},
+        {text: 'two', second: 'how'},
+        {text: 'three', second: 'are'},
+        {text: 'four', second: 'you'},
+      ],
     };
   }
-  async componentDidMount() {
-    const environment = await Utils.retrieveDataFromAsyncStorage("ENVIRONMENT");
 
-    console.log(environment, "environmentenvironmentenvironment");
+  savingArrInAsyncstorage = async () => {
+    try {
+      await AsyncStorage.setItem(
+        'savingArr',
+        JSON.stringify(this.state.dummyArr),
+      );
+    } catch (error) {
+      console.log(error, 'err saving in local');
+    }
+  };
+  gettingArrFromAsyncstorage=async()=>{
+    try {
+      const myArray = await AsyncStorage.getItem('savingArr');
+      if (myArray !== null) {
+        // We have data!!
+        console.log(JSON.parse(myArray),'my arr is....');
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log(error, 'err getting saving in local');
+
+    }
+  }
+
+  async componentDidMount() {
+    this.savingArrInAsyncstorage();
+    this.gettingArrFromAsyncstorage();
+
+
+    const environment = await Utils.retrieveDataFromAsyncStorage('ENVIRONMENT');
+
+    console.log(environment, 'environmentenvironmentenvironment');
     this.setState({
       isLoading: true,
       environment: environment,
     });
     EnvironmentVar()
-      .then((res) => {
-        console.log("coming inside res", res);
+      .then(res => {
+        console.log('coming inside res', res);
         this.setState({
           envUrl: res,
         });
       })
-      .catch((err) => {
-        console.log("IN error", err);
+      .catch(err => {
+        console.log('IN error', err);
       });
     this.initStates();
   }
 
   initStates = async () => {
-    const username = await Utils.retrieveDataFromAsyncStorage("USER_NAME");
+    const username = await Utils.retrieveDataFromAsyncStorage('USER_NAME');
     this.setState({
       username: username,
       isLoading: false,
@@ -67,20 +103,20 @@ class GrnSettings extends Component {
 
   showLogoutAlert = () => {
     Alert.alert(
-      "Log Out",
-      "Are you sure you want to log out?",
+      'Log Out',
+      'Are you sure you want to log out?',
       [
-        { text: "Cancel", style: "cancel" },
-        { text: "OK", onPress: this.navigateBackToLogin },
+        {text: 'Cancel', style: 'cancel'},
+        {text: 'OK', onPress: this.navigateBackToLogin},
       ],
-      { cancelable: false }
+      {cancelable: false},
     );
   };
 
   navigateBackToLogin = async () => {
-    await Utils.removeItemValue("USER_NAME");
-    await Utils.removeItemValue("ENVIRONMENT");
-    this.props.navigation.navigate("Login");
+    await Utils.removeItemValue('USER_NAME');
+    await Utils.removeItemValue('ENVIRONMENT');
+    this.props.navigation.navigate('Login');
   };
 
   // navigateBackToLogin = () => {
@@ -93,7 +129,7 @@ class GrnSettings extends Component {
   //   return this.props.navigation.dispatch(resetAction);
   // };
   refreshData = async () => {
-    const { envUrl } = this.state;
+    const {envUrl} = this.state;
     this.setState({
       isLoading: true,
     });
@@ -108,7 +144,7 @@ class GrnSettings extends Component {
   render() {
     const appVersion = DeviceInfo.getVersion();
     const buildNumber = DeviceInfo.getBuildNumber();
-    const { envUrl, environment } = this.state;
+    const {envUrl, environment} = this.state;
     return (
       <SafeAreaView style={styles.container}>
         <Spinner
@@ -119,8 +155,7 @@ class GrnSettings extends Component {
         <View style={styles.container}>
           <ImageBackground
             source={Images.grnSettingsBackground}
-            style={styles.backgroundImage}
-          >
+            style={styles.backgroundImage}>
             <View style={styles.info}>
               <Text style={styles.infoTitle}>USERNAME:</Text>
               <Text style={styles.infoText}>{this.state.username}</Text>
@@ -142,14 +177,13 @@ class GrnSettings extends Component {
             <View style={styles.info}>
               <Text style={styles.infoTitle}>APP VERSION:</Text>
               <Text style={styles.infoText}>
-                {"v" + appVersion + "(" + buildNumber + ")"}
+                {'v' + appVersion + '(' + buildNumber + ')'}
               </Text>
             </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 onPress={this.refreshData.bind(this)}
-                style={styles.refreshDataButtonStyle}
-              >
+                style={styles.refreshDataButtonStyle}>
                 <View>
                   <Text style={styles.buttonText}>REFRESH DATA</Text>
                 </View>
@@ -157,8 +191,7 @@ class GrnSettings extends Component {
 
               <TouchableOpacity
                 onPress={this.showLogoutAlert.bind(this)}
-                style={styles.logoutButtonStyle}
-              >
+                style={styles.logoutButtonStyle}>
                 <View>
                   <Text style={styles.buttonText}>LOG OUT</Text>
                 </View>
@@ -171,11 +204,11 @@ class GrnSettings extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {};
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {};
 };
 

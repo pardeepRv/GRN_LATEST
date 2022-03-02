@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {Component} from 'react';
 import {
   Alert,
@@ -250,10 +251,12 @@ class GrnChangeReceipt extends Component {
       } else {
         console.log(
           'Response API: failed',
-          result.status + ' - ' + result.problem,
+          JSON.stringify(result) + ' - ' + result.problem,
         );
         // this.submitFailedAlert();
-        alert(result.status + ' - ' + result.problem);
+        alert('Image uploaded error due to internet.');
+
+        // alert(result.status + ' - ' + result.problem);
       }
     }, 100);
   }
@@ -449,46 +452,37 @@ class GrnChangeReceipt extends Component {
           'Response API: failed',
           response.status + ' - ' + response.problem,
         );
+        let obj = {};
+
+        obj.username = username;
+        obj.order_number = order_number;
+        obj.order_line_number = order_line_number;
+        obj.quantity = quantity;
+        obj.unit_of_measure = unit_of_measure;
+        obj.item_number = item_number;
+        obj.item_description = item_description;
+        obj.to_organization = to_organization;
+        obj.comments = comments;
+        obj.receipt_num = receipt_num;
+        obj.deliver_tran_id = deliver_tran_id;
+        obj.receive_tran_id = receive_tran_id;
+        obj.type = type;
+        obj.file_id = file_id;
 
         this.submitFailedAlert();
+        this.savingArrInAsyncstorage(obj);
       }
     }, 100);
   }
-  test_function = (body) => {
-      console.log(body,'to console');
-    debugger
-    // let body = new FormData();
-    // body.append('photo', {
-    //   uri: 'file:///var/mobile/Containers/Data/Application/D41A2EDB-847E-493D-870D-A779120EAC4F/tmp/000E1250-7D6A-4AD5-A549-67C6ECD7827C.jpg',
-    //   name: 'newPic',
-    //   filename: 'imageName.png',
-    //   type: 'image/jpeg',
-    // });
 
-    // body.append('Content-Type', 'image/png');
-
-    fetch(
-      `https://pdev1a1-inoapps4.inoapps.com/ords/inoapps_ec/grn.mobility.v1/postPhoto/RVTECHNOLOGIES.USER1,testPhotoName`,
-      {
-        method: 'post',
-        body: body,
-        headers:{  
-          "Content-Type": "multipart/form-data",
-          "otherHeader": "foo",
-          }
-      },
-    )
-      .then(response => {
-      console.log(response,'in response');
-      
-        response.json();
-      })
-      .then(response => {
-        console.log('response in fetch', response);
-      })
-      .catch(error => {
-        console.log('error in fetch', error);
-      });
+  //save object to local storage as change receipt
+  savingArrInAsyncstorage = async obj => {
+    console.log(obj, 'obj in changeRecipts');
+    try {
+      await AsyncStorage.setItem('SAVE_CHANGE_RECEIPT', JSON.stringify(obj));
+    } catch (error) {
+      console.log(error, 'err saving in local');
+    }
   };
 
   _doOpenOption = () => {
@@ -539,11 +533,12 @@ class GrnChangeReceipt extends Component {
         this.data = new FormData();
         this.data.append('photo', {
           uri: res && res.assets && res.assets.length > 0 && res.assets[0].uri,
-          type: res && res.assets && res.assets.length > 0 && res.assets[0].type,//'image/jpeg', // or photo.type
+          type:
+            res && res.assets && res.assets.length > 0 && res.assets[0].type, //'image/jpeg', // or photo.type
           name: 'testPhotoName',
         });
         // this.data.append('Content-Type', 'image/png');
-              // this.test_function(this.data);
+        // this.test_function(this.data);
       }
     });
   };

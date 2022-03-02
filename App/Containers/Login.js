@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {connect} from 'react-redux';
+import NetInfo from '@react-native-community/netinfo';
 import CheckBox from 'react-native-modest-checkbox';
 import {Images} from '../Themes';
 import Drawer from '././Drawer';
@@ -41,9 +42,9 @@ class Login extends Component {
     //apisauce = newApi;
 
     this.state = {
-      // username: "RVTechnologies.User1",
-      // password: "inoapps",
-      // environment: "PDEV1",
+      username: 'RVTechnologies.User1',
+      password: 'inoapps',
+      environment: 'PDEV1',
 
       // username: "PROC_EMP",
       // password: "Skanska123",
@@ -57,9 +58,9 @@ class Login extends Component {
       // password: 'Welcome41',
       // environment: 'PDEV2',
 
-      username: "",
-      password: "",
-      environment: "",
+      // username: "",
+      // password: "",
+      // environment: "",
 
       envURL: '',
       isLoading: false,
@@ -72,6 +73,43 @@ class Login extends Component {
   // componentDidMount() {
   //   this.checkTimeOut();
   // }
+
+ removeNetInfoSubscription = NetInfo.addEventListener(state => {
+    // const offline = !(state.isConnected && state.isInternetReachable);
+    // setOfflineStatus(offline);
+    console.log('Connection type', state.type);
+    console.log('Is connected?', state.isConnected);
+    if(state && state.isConnected){
+      // alert('you are connected')
+    }else{
+      // alert('you are connected')
+    }
+  });
+
+  // componentDidMount() {
+  //   this.didBlurSubscription = this.props.navigation.addListener(
+  //     'willFocus',
+  //     payload => {
+  //       console.log('willFocus', payload);
+  //       // NetInfo.fetch().then(state => {
+  //       //   console.log('Connection type', state.type);
+  //       //   console.log('Is connected?', state.isConnected);
+  //       // });
+
+  //       this.removeNetInfoSubscription = NetInfo.addEventListener(state => {
+  //         // const offline = !(state.isConnected && state.isInternetReachable);
+  //         // setOfflineStatus(offline);
+  //         console.log('Connection type', state.type);
+  //         console.log('Is connected?', state.isConnected);
+  //       });
+  //     },
+  //   );
+  // }
+
+  componentWillUnmount() {
+    // this.didBlurSubscription.remove();
+    this.removeNetInfoSubscription;
+  }
 
   async getEnvironment() {
     //   fetch('https://pdev2a1-inoapps4.inoapps.com/ords/inoapps_ec/grn.mobility.v1/getPurchaseOrder/RVTechnologies.User1')

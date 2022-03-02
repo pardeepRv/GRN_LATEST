@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {Component} from 'react';
 import {
   Alert,
@@ -296,7 +297,7 @@ class GrnRejectReceipt extends Component {
           'Response API: failed',
           result.status + ' - ' + result.problem,
         );
-        alert(result.status + ' - ' + result.problem);
+        alert(result.problem);
 
         // this.submitFailedAlert();
       }
@@ -461,13 +462,40 @@ class GrnRejectReceipt extends Component {
         console.log(
           'Response API: failed',
           response.status + ' - ' + response.problem,
-        );
+        ); 
+        let obj = {};
+
+        obj.username = username;
+        obj.order_number = order_number;
+        obj.order_line_number = order_line_number;
+        obj.quantity = quantity;
+        obj.unit_of_measure = unit_of_measure;
+        obj.item_number = item_number;
+        obj.item_description = item_description;
+        obj.to_organization = to_organization;
+        obj.comments = comments;
+        obj.receipt_num = receipt_num;
+        obj.deliver_tran_id = deliver_tran_id;
+        obj.receipt_tran_id = receipt_tran_id;
+        obj.type = type;
+        obj.file_id = file_id;
 
         //To Do : save receipt Data
         this.submitFailedAlert();
+        this.savingArrInAsyncstorage(obj);
       }
     }, 100);
   }
+
+  //save object to local storage as reject receipt
+  savingArrInAsyncstorage = async obj => {
+     console.log(obj, 'obj in SAVE_REJECT_RECEIPT');
+    try {
+      await AsyncStorage.setItem('SAVE_REJECT_RECEIPT', JSON.stringify(obj));
+    } catch (error) {
+      console.log(error, 'err saving in local');
+    }
+  };
 
   _doOpenOption = () => {
     Alert.alert(

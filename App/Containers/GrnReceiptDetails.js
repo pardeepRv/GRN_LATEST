@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {Component} from 'react';
 import {
   Alert,
@@ -310,6 +311,11 @@ class GrnReceiptDetails extends Component {
           'pending',
           this.state.index,
         );
+ 
+        if ([receipt].length > 0) {
+          this.savingArrInAsyncstorage([receipt]);
+        }
+
         this.submitFailedAlert();
         console.log(
           'Response API: failed',
@@ -318,6 +324,15 @@ class GrnReceiptDetails extends Component {
       }
     }, 100);
   }
+
+  //save arr to local storage as single line
+  savingArrInAsyncstorage = async arr => {
+    try {
+      await AsyncStorage.setItem('SAVE_SINGLE_LINE_PO', JSON.stringify(arr));
+    } catch (error) {
+      console.log(error, 'err saving in local');
+    }
+  };
 
   nextReceipt = () => {
     if (isNaN(this.state.quantity) || this.state.quantity == 0) {
@@ -479,7 +494,7 @@ class GrnReceiptDetails extends Component {
     let result = await this.api['postPhoto'].apply(this, params);
 
     this.setState({isLoading: false});
-    console.log(result,'Result of image Api>>>>>>');
+    console.log(result, 'Result of image Api>>>>>>');
     setTimeout(async () => {
       if (result.ok) {
         console.log('Response API ok: ', result.data);
@@ -513,7 +528,7 @@ class GrnReceiptDetails extends Component {
           'pending',
           this.state.index,
         );
-        alert(result.status + ' - ' + result.problem)
+        alert('Err while uploding photo.');
         // this.submitFailedAlert();
         console.log(
           'Response API: failed',

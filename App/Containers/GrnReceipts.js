@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   View,
   Text,
@@ -9,16 +9,17 @@ import {
   ActivityIndicator,
   TouchableHighlight,
 } from 'react-native';
-import { connect } from 'react-redux';
-import { Images } from '../Themes';
+import {connect} from 'react-redux';
+import {Images} from '../Themes';
 import GrnEditReceipt from '././GrnEditReceipt';
 // import { StackNavigator } from "react-navigation";
-import { createStackNavigator } from 'react-navigation-stack';
+import {createStackNavigator} from 'react-navigation-stack';
+import NetInfo from '@react-native-community/netinfo';
 
 import DBGrnReceiptDataHelper from '../DB/DBGrnReceiptDataHelper';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Utils from '../Utils/Utils';
-import { NavigationEvents } from 'react-navigation';
+import {NavigationEvents} from 'react-navigation';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
@@ -28,6 +29,7 @@ import styles from './Styles/GrnReceiptsStyle';
 // For API
 import API from '../../App/Services/Api';
 import FJSON from 'format-json';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class GrnReceipts extends Component {
   api = {};
@@ -48,10 +50,47 @@ class GrnReceipts extends Component {
 
   componentDidMount() {
     this.refreshPayload();
+    // this.gettingArrFromAsyncstorage();
   }
 
   refreshPayload = () => {
     this.getReceiptApi();
+  };
+
+  //get change receipt data from local storage
+  gettingArrFromAsyncstorage = async () => {
+    try {
+      this.setState({isLoading: true});
+      const changeReciptsdata = await AsyncStorage.getItem(
+        'SAVE_CHANGE_RECEIPT',
+      );
+
+      if (changeReciptsdata !== null) {
+        console.log(
+          JSON.parse(changeReciptsdata),
+          'changeReciptsdata my arr is....',
+        );
+        let savedObj = JSON.parse(changeReciptsdata);
+        console.log(savedObj, 'savedObj');
+
+        NetInfo.fetch().then(async state => {
+          console.log('Connection type', state.type);
+          console.log('Is connected?', state.isConnected);
+
+          if (state && state.isConnected) {
+            console.log('coming ub grnrec');
+          } else {
+            alert('Please check your internet connection.');
+            this.setState({isLoading: false});
+          }
+        });
+      } else {
+        this.setState({isLoading: false});
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log(error, 'err getting saving in local');
+    }
   };
 
   // MARK: Api
@@ -132,8 +171,7 @@ class GrnReceipts extends Component {
         'https://skap1a1-skanskapaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
-    }
-    else if (environment == 'GTDEV1') {
+    } else if (environment == 'GTDEV1') {
       envURL =
         'https://gtdev1a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
@@ -157,7 +195,9 @@ class GrnReceipts extends Component {
     if (arr && arr.length > 0) {
       let sortedProductsAsc;
 
-      sortedProductsAsc = arr.sort((a, b) => b.order_number.localeCompare(a.order_number))
+      sortedProductsAsc = arr.sort((a, b) =>
+        b.order_number.localeCompare(a.order_number),
+      );
 
       this.setState({
         dataObjects: sortedProductsAsc,
@@ -212,7 +252,7 @@ class GrnReceipts extends Component {
       return <MyCustomCell title={item.title} description={item.description} />
     *************************************************************/
 
-  renderRow = ({ item, index }) => {
+  renderRow = ({item, index}) => {
     if (item.submitStatus == 'processing') {
       return (
         <TouchableHighlight

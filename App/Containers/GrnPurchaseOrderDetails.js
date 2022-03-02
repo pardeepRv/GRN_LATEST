@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {Component} from 'react';
 import {
   Alert,
@@ -10,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
+import NetInfo from '@react-native-community/netinfo';
 import CheckBox from 'react-native-modest-checkbox';
 import {connect} from 'react-redux';
 import API from '../../App/Services/Api';
@@ -482,9 +484,27 @@ class GrnPurchaseOrderDetails extends Component {
           response.status + ' - ' + response.problem,
         );
         this.submitFailedAlert();
+        if (
+          updatedArr &&
+          updatedArr.length > 0 &&
+          response.problem == 'NETWORK_ERROR'
+        ) {
+          this.savingMultilineArrInAsyncstorage(updatedArr);
+        }
       }
     }, 100);
   }
+
+  //save arr to local storage as multiline line
+
+  savingMultilineArrInAsyncstorage = async arr => {
+    console.log(arr, 'saving to savingMultilineArrInAsyncstorage');
+    try {
+      await AsyncStorage.setItem('SAVE_MULTILINE_PO', JSON.stringify(arr));
+    } catch (error) {
+      console.log(error, 'err saving in local');
+    }
+  };
 
   async postCreateReceipt() {
     debugger;
@@ -531,7 +551,7 @@ class GrnPurchaseOrderDetails extends Component {
     );
 
     this.setState({isLoading: false});
-    console.log(response, 'response from Image API');
+    console.log(response, 'response receive entire receipt API');
     setTimeout(() => {
       if (response.ok) {
         console.log('Print Receipts', this.state.createReceiptObjects);
@@ -545,10 +565,30 @@ class GrnPurchaseOrderDetails extends Component {
           'Response API: failed',
           response.status + ' - ' + response.problem,
         );
+
         this.submitFailedAlert();
+
+        if (
+          this.state.createReceiptObjects &&
+          this.state.createReceiptObjects.length > 0 &&
+          response.problem == 'NETWORK_ERROR'
+        ) {
+          this.savingArrInAsyncstorage(this.state.createReceiptObjects);
+        }
       }
     }, 100);
   }
+
+  //save arr to local storage as entire po
+
+  savingArrInAsyncstorage = async arr => {
+    console.log(arr, 'saving to storage');
+    try {
+      await AsyncStorage.setItem('SAVE_ENTIRE_PO', JSON.stringify(arr));
+    } catch (error) {
+      console.log(error, 'err saving in local');
+    }
+  };
 
   async counterToCallCreateReceiptsAPI(
     currentNoOfReceiptsToPost,
@@ -720,6 +760,61 @@ class GrnPurchaseOrderDetails extends Component {
       );
     }
   }
+
+  //get single line data from local storage
+  gettingArrFromAsyncstorage = async () => {
+    try {
+      this.setState({isLoading: true});
+      const signleLinePo = await AsyncStorage.getItem('SAVE_SINGLE_LINE_PO');
+
+      if (signleLinePo !== null) {
+        console.log(JSON.parse(signleLinePo), 'signleLinePo my arr is....');
+        let saveArr = JSON.parse(signleLinePo);
+        console.log(saveArr[0], 'wefwefwef');
+        NetInfo.fetch().then(async state => {
+          console.log('Connection type', state.type);
+          console.log('Is connected?', state.isConnected);
+          if (state && state.isConnected && saveArr.length > 0) {
+            const username = await Utils.retrieveDataFromAsyncStorage(
+              'USER_NAME',
+            );
+            const response = await CreateReceiptsAPIHelper.postCreateReceipt(
+              username,
+              saveArr,
+              this.state.envUrl,
+            );
+
+            this.setState({isLoading: false});
+            console.log(response, 'Res from create receipt api>>>');
+            setTimeout(async () => {
+              if (response && response.ok) {
+                console.log('Response API ok: ', response.data);
+                this.submitSuccessfulAlert();
+                await AsyncStorage.removeItem('SAVE_SINGLE_LINE_PO');
+                this.setState({isLoading: false});
+              } else {
+                console.log(
+                  'Response API: failed',
+                  response.status + ' - ' + response.problem,
+                );
+                alert(response.status + ' - ' + response.problem);
+                this.setState({isLoading: false});
+              }
+            }, 100);
+          } else {
+            alert('Please check your internet connection.');
+            this.setState({isLoading: false});
+          }
+        });
+      } else {
+        alert('All data has been synced.');
+        this.setState({isLoading: false});
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log(error, 'err getting saving in local');
+    }
+  };
 
   /************************************************************
    * STEP 1
@@ -1082,6 +1177,13 @@ class GrnPurchaseOrderDetails extends Component {
             <View style={styles.mainContainer}>
               <View style={styles.lineWithBottomSpace} />
               <View style={styles.line} />
+
+              {/* <TouchableOpacity onPress={this.gettingArrFromAsyncstorage}>
+                <Text style={[styles.titleStyle, {alignSelf: 'flex-end'}]}>
+                  Sync
+                </Text>
+              </TouchableOpacity> */}
+
               <View style={styles.headerContainer}>
                 <Text style={styles.titleStyle}>PURCHASE ORDER HEADER</Text>
                 <View style={styles.shortLine} />
