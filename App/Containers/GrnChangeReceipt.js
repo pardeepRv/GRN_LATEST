@@ -349,7 +349,7 @@ class GrnChangeReceipt extends Component {
 
         Alert.alert(
           '',
-          'Unable to create the change receipts as there is no internet connection. Please recreate the change receipt when the connection is restored.',
+          'Unable to change the receipt as there is no internet connection. The receipt will be changed when there is internet connection.',
           [{text: 'OK', onPress: () => this.props.navigation.popToTop()}],
           {cancelable: false},
         );
@@ -585,7 +585,7 @@ class GrnChangeReceipt extends Component {
   submitFailedAlert() {
     Alert.alert(
       '',
-      'Unable to create the change receipt as there is no internet connection. Please recreate the change receipt when the connection is restored.',
+      'Unable to change the receipt as there is no internet connection. The receipt will be changed when there is internet connection.',
       [{text: 'OK', onPress: () => this.props.navigation.pop()}],
       {cancelable: false},
     );

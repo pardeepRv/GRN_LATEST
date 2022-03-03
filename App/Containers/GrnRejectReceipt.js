@@ -297,8 +297,8 @@ class GrnRejectReceipt extends Component {
           'Response API: failed',
           result.status + ' - ' + result.problem,
         );
-        alert(result.problem);
-
+        // alert(result.problem);
+        alert('Image uploaded error due to internet.');
         // this.submitFailedAlert();
       }
     }, 100);
@@ -376,7 +376,7 @@ class GrnRejectReceipt extends Component {
         //To Do : save receipt Data
         Alert.alert(
           '',
-          'Unable to create the reject receipt as there is no internet connection. Please recreate the reject receipt when the connection is restored.',
+          'Unable to create the reject receipt as there is no internet connection. The receipt will be rejected when there is connection.',
           [{text: 'OK', onPress: () => this.props.navigation.popToTop()}],
           {cancelable: false},
         );
@@ -462,7 +462,7 @@ class GrnRejectReceipt extends Component {
         console.log(
           'Response API: failed',
           response.status + ' - ' + response.problem,
-        ); 
+        );
         let obj = {};
 
         obj.username = username;
@@ -489,7 +489,7 @@ class GrnRejectReceipt extends Component {
 
   //save object to local storage as reject receipt
   savingArrInAsyncstorage = async obj => {
-     console.log(obj, 'obj in SAVE_REJECT_RECEIPT');
+    console.log(obj, 'obj in SAVE_REJECT_RECEIPT');
     try {
       await AsyncStorage.setItem('SAVE_REJECT_RECEIPT', JSON.stringify(obj));
     } catch (error) {
@@ -621,7 +621,7 @@ class GrnRejectReceipt extends Component {
   submitFailedAlert() {
     Alert.alert(
       '',
-      'Unable to create the reject receipt as there is no internet connection. Please recreate the reject receipt when the connection is restored.',
+      'Unable to reject the receipt as there is no internet connection. The receipt will be rejected when there is internet connection.',
       [{text: 'OK', onPress: () => this.props.navigation.popToTop()}],
       {cancelable: false},
     );

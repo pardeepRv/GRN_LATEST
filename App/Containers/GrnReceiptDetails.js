@@ -378,7 +378,7 @@ class GrnReceiptDetails extends Component {
   submitFailedAlert() {
     Alert.alert(
       '',
-      'Unable to create the receipts as there is no internet connection. Please recreate the receipt when the connection is restored.',
+      'Unable to create the receipt as there is no internet connection. The recipt will be created when there is a connection.',
       [{text: 'OK', onPress: () => this.props.navigation.pop()}],
       {cancelable: false},
     );
