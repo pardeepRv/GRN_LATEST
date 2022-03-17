@@ -176,6 +176,11 @@ class GrnReceipts extends Component {
         'https://gtdev1a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
       this.api = new API.create(envURL);
       console.log('New ENV URL RECEIPTS ', envURL);
+    }else if (environment == 'GTDEV2') {
+      envURL =
+        'https://gtdev2a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
+        this.api = new API.create(envURL);
+        console.log('New ENV URL RECEIPTS ', envURL);
     }
 
     const api = API.create(envURL);

@@ -42,9 +42,9 @@ class Login extends Component {
     //apisauce = newApi;
 
     this.state = {
-      username: 'RVTechnologies.User1',
-      password: 'inoapps',
-      environment: 'PDEV1',
+      // username: 'RVTechnologies.User1',
+      // password: 'inoapps',
+      // environment: 'PDEV1',
 
       // username: "PROC_EMP",
       // password: "Skanska123",
@@ -58,9 +58,9 @@ class Login extends Component {
       // password: 'Welcome41',
       // environment: 'PDEV2',
 
-      // username: "",
-      // password: "",
-      // environment: "",
+      username: "",
+      password: "",
+      environment: "",
 
       envURL: '',
       isLoading: false,
@@ -74,14 +74,14 @@ class Login extends Component {
   //   this.checkTimeOut();
   // }
 
- removeNetInfoSubscription = NetInfo.addEventListener(state => {
+  removeNetInfoSubscription = NetInfo.addEventListener(state => {
     // const offline = !(state.isConnected && state.isInternetReachable);
     // setOfflineStatus(offline);
     console.log('Connection type', state.type);
     console.log('Is connected?', state.isConnected);
-    if(state && state.isConnected){
+    if (state && state.isConnected) {
       // alert('you are connected')
-    }else{
+    } else {
       // alert('you are connected')
     }
   });
@@ -203,6 +203,11 @@ class Login extends Component {
       } else if (environment == 'GTDEV1') {
         envURL =
           'https://gtdev1a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
+        console.log('New ENV URL ', envURL);
+        this.api = new API.create(envURL);
+      } else if (environment == 'GTDEV2') {
+        envURL =
+          'https://gtdev2a1-gallifordtrypaas.inoappsproducts.com/ords/inoapps_ec/';
         console.log('New ENV URL ', envURL);
         this.api = new API.create(envURL);
       } else {
